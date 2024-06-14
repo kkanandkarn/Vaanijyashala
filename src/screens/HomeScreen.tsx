@@ -1,18 +1,21 @@
-import React from 'react'
+import React, { useContext } from 'react'
 import { Image, StatusBar, StyleSheet, Text, TouchableOpacity, View } from 'react-native'
 import { fonts } from '../constant'
 import { useNavigation } from '@react-navigation/native'
+import { RegisterFormContext } from '../contexts/RegisterFormContext'
 
 
 function HomeScreen({navigation}:any) {
-    console.log(navigation)
+    
+    const {formData} = useContext(RegisterFormContext) || { formData: null }
+    console.log(formData)
     
     const letsConnect = () => navigation.navigate("SignUp")
   return (
     
       <View style = {styles.container}>
           <StatusBar backgroundColor="#F45F20" barStyle="light-content" />
-          <Image source={require('../../assets/img/logo_bg.png')}   style={{width: 200, height: 200}}/>
+          <Image source={require('../../assets/img/logo_bg.png')}   style={{width: 200, height: 200}}/>         
           <Text style = {styles.pageTitle}>Your Shop at Your Fingertips</Text>
           <Text style = {styles.pageText}>Sell More, Earn More</Text>
           <Image source={require('../../assets/img/shopkeeper_img.png')}  style = {styles.shopkeeperImg}/>

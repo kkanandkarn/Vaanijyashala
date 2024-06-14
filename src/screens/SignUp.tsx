@@ -1,164 +1,196 @@
-import React, { useState } from 'react';
-import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import React, { useContext, useState } from 'react';
+import { StyleSheet, Text, TouchableOpacity, View, KeyboardAvoidingView, Platform, SafeAreaView } from 'react-native';
 import { fonts } from '../constant';
 import InputBox from '../../components/InputBox';
 import Dropdown from '../../components/Dropdown';
 import CheckBox from '@react-native-community/checkbox';
-import AsyncStorage from '@react-native-async-storage/async-storage';
+import { RegisterFormContext } from '../contexts/RegisterFormContext';
+import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
+import { useDispatch, useSelector } from 'react-redux';
+import { AppDispatch, RootState } from '../store';
+import { setFormData } from '../store/formSlice';
+import Toast from 'react-native-toast-message';
 
-function SignUp() {
+interface DropdownOption {
+  id: number;
+  label: string;
+}
+
+
+const SignUp: React.FC = ({ navigation }: any) => {
   const dropdownValues = [
-    { id: 1, label: 'User', value: 1 },
-    { id: 2, label: 'Seller/Merchant', value: 2 },
+    { id: 1, label: 'User'},
+    { id: 2, label: 'Seller/Merchant'},
   ];
 
-  const [selectedRole, setSelectedRole] = useState<number | null>(1); // Default to "User"
-  const [email, setEmail] = useState('');
-  const [name, setName] = useState('')
-  const [referralCode, setReferralCode] = useState('');
-  const [isChecked, setIsChecked] = useState(false);
-  const [nameError, setNameError] = useState(false)
-  const [emailError, setEmailError] = useState(false)
-  const [referralError, setReferralError] = useState(false)
+ const formData = useSelector((state: RootState) => state.form)
+const dispatch = useDispatch<AppDispatch>()
 
+  const [nameError, setNameError] = useState(false);
+  const [emailError, setEmailError] = useState(false);
+  const [referralError, setReferralError] = useState(false);
+  const [isAgreeError, setIsAgreeError] = useState(false);
 
-  const submitForm = async () => {
-   
-   
-    console.log({
-      selectedRole,
-      name,
-      email,
-      referralCode,
-      isChecked,
-    });
-    if(name === '') {        
-        setNameError(true)
+  const submitForm = () => {
+    if (formData.name === '') {
+      setNameError(true);
     }
-    if(email === '') {
-        setEmailError(true)
+    if (formData.email === '') {
+      setEmailError(true);
+    }
+    if (!formData.isChecked) {
+      setIsAgreeError(true);
     }
 
-    if(name !== '' && email !== '') {
-        setNameError(false)
-        setEmailError(false)
+    if (formData.name !== '' && formData.email !== '' && formData.isChecked) {
+      setNameError(false);
+      setEmailError(false);
+      setIsAgreeError(false);
+      dispatch(setFormData({inputForm: 'registerForm'}))
+      Toast.show({
+        type: 'info',
+        text1: "OTP Sent"
+      })
+      navigation.navigate("OTP");
     }
-  
-    const registerFormData = JSON.stringify({selectedRole: selectedRole, email: email, referralCode:referralCode, isChecked: isChecked})
-    await AsyncStorage.setItem("registerFormData", registerFormData)
   };
 
-  return (
-    <View style={styles.container}>
-      <View style={styles.headerContainer}>
-        <Text style={styles.headerText}>Sign Up</Text>
-      </View>
-      <View style={styles.registerFormContainer}>
-        <View style={styles.registerForm}>
-          <Text style={styles.welcomeText}>Welcome</Text>
-          <Dropdown
-            dropdownTitle="Register as"
-            values={dropdownValues}
-            value={selectedRole}
-            onChangeValue={setSelectedRole}
-          />
-         <InputBox
-  inputTitle="Name"
-  autoComplete="name"
-  keyboardType="name"
-  placeholder="Enter Name"
-  value={name}
-  onChangeText={setName}
-  onBlur={() => {
-    if (name === '') {
-      setNameError(true);
-    } else {
-      setNameError(false);
+  const handleCheckboxChange = (value: boolean) => {
+   dispatch(setFormData({isChecked: value}))
+    if (value) {
+      setIsAgreeError(false); // Reset error when checked
     }
-  }}
-  error={nameError}
-  errorMessage={nameError ? 'Name is required' : ''}
-/>
+  };
+  const handleDropdownChange = (option: DropdownOption) => {
+   dispatch(setFormData({selectedRole: option.id}))
+  };
+  
+  
+  
+  
 
-          <InputBox
-            inputTitle="Email"
-            autoComplete="email"
-            keyboardType="email-address"
-            placeholder="Enter email"
-            value={email}
-            onChangeText={setEmail}
-            onBlur={() => {
-                if (email === '') {
-                  setEmailError(true);
-                } else {
-                  setEmailError(false);
-                }
-              }}
+  return (
+   <SafeAreaView style={{flex: 1, backgroundColor: "white"}}>
+
+        <View style={styles.headerContainer}>
+          <Text style={styles.headerText}>Sign Up</Text>
+        </View>
+      
+            
+            <KeyboardAwareScrollView
+        style = {{width: '100%', alignSelf: 'center', marginTop: 50}}
+    contentContainerStyle = {{justifyContent: 'center', alignItems: 'center'}}
+      >
+        <Text style={styles.welcomeText}>Welcome</Text>
+            <Dropdown 
+            data={dropdownValues} 
+            title={'Register as'}
+            onSelectValue={handleDropdownChange} />
+
+            <InputBox
+              inputTitle="Name"
+              autoComplete="name"
+              keyboardType="default"
+              placeholder="Enter Name"
+              value={formData.name}
+              onChangeText={(text: string) => dispatch(setFormData({ name: text }))}
+              onBlur={() => setNameError(formData.name === '')}
+              error={nameError}
+              errorMessage={nameError ? 'Name is required' : ''}
+              required={true}
+            />
+
+            <InputBox
+              inputTitle="Email"
+              autoComplete="email"
+              keyboardType="email-address"
+              placeholder="Enter email"
+              value={formData.email}
+              onChangeText={(text: string) => dispatch(setFormData({ email: text }))}
+              onBlur={() => setEmailError(formData.email === '')}
               error={emailError}
               errorMessage={emailError ? 'Email is required' : ''}
-          />
-          
-          <InputBox
-            inputTitle="Referral Code"
-            autoComplete="Text"
-            keyboardType="text"
-            placeholder="Enter Referral Code"
-            value={referralCode}
-            onChangeText={setReferralCode}
-            onBlur={() => {
-               setReferralError(false)
-              }}
+              required={true}
+            />
+
+            <InputBox
+              inputTitle="Referral Code"
+              autoComplete="off"
+              keyboardType="default"
+              placeholder="Enter Referral Code"
+              value={formData.referralCode}
+              onChangeText={(text: string) => dispatch(setFormData({ referralCode: text }))}
+              onBlur={() => setReferralError(false)}
               error={referralError}
               errorMessage={referralError ? 'Referral Code is required' : ''}
-          />
-
-          <View style={styles.checkBoxContainer}>
-            <CheckBox
-              value={isChecked}
-              onValueChange={setIsChecked}
-              tintColors={{ true: '#E65629', false: '#000000' }}
             />
-            <Text style={styles.checkBoxText}>I agree to the <Text style={{color: "#E65629", fontWeight: 'bold'}}>Terms & Conditions</Text> and <Text style={{color: "#E65629", fontWeight: 'bold'}}>Privacy Policy</Text></Text>
-          </View>
 
-          <TouchableOpacity style={styles.button} onPress={submitForm}>
-            <Text style={styles.buttonText}>Request OTP</Text>
-          </TouchableOpacity>
-        </View>
-      </View>
-    </View>
+            <View style={styles.checkBoxContainer}>
+              <CheckBox
+                value={formData.isChecked}
+                onValueChange={handleCheckboxChange}
+                tintColors={{ true: '#E65629', false: '#000000' }}
+              />
+              <Text style={styles.checkBoxText}>
+                I agree to the{' '}
+                <Text style={{ color: '#E65629', fontWeight: 'bold' }}>
+                  Terms & Conditions
+                </Text>{' '}
+                and{' '}
+                <Text style={{ color: '#E65629', fontWeight: 'bold' }}>
+                  Privacy Policy
+                </Text>
+              </Text>
+            </View>
+            {isAgreeError && <Text style={styles.isAgreeError}>Please agree to our Terms & Conditions and Privacy Policy </Text>}
+
+            <TouchableOpacity style={styles.button} onPress={submitForm}>
+              <Text style={styles.buttonText}>Request OTP</Text>
+            </TouchableOpacity>
+            </KeyboardAwareScrollView>
+         
+        
+
+        <Text style={styles.bottomText}>Already have an account?         
+            <Text style={{color: '#E65629', fontFamily: fonts.POPPINS_BOLD }} onPress={()=> navigation.navigate("LogIn")}>  Log in</Text>        
+           
+        </Text>
+     
+      </SafeAreaView>
   );
-}
+};
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: 'white',
+    justifyContent: 'center',
+    alignItems: 'center',
   },
   headerContainer: {
     alignItems: 'center',
     marginTop: 20,
   },
+
   headerText: {
     color: '#E65629',
     fontFamily: fonts.POPPINS_BOLD,
     fontSize: 25,
   },
   registerFormContainer: {
-    flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
   },
   registerForm: {
     alignItems: 'center',
     justifyContent: 'center',
-    width: '99%',
+    width: '100%',
   },
   welcomeText: {
     fontSize: 32,
     fontFamily: fonts.POPPINS_BOLD,
     color: '#E65629',
-    marginBottom: 5,
+    textAlign: 'center'
   },
   button: {
     marginTop: 40,
@@ -182,6 +214,17 @@ const styles = StyleSheet.create({
   checkBoxText: {
     marginLeft: 10,
   },
+  isAgreeError: {
+    marginTop: 10,
+    color: 'red',
+  },
+  bottomText: {
+    textAlign: 'center',
+    fontFamily: fonts.POPPINS_REGULAR,
+    fontSize: 16,
+    marginBottom: 10
+  },
+ 
 });
 
 export default SignUp;

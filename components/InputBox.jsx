@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { Text, TextInput, View, StyleSheet } from 'react-native';
+import { fonts } from '../src/constant';
 
 function InputBox({
   inputTitle,
@@ -12,17 +13,19 @@ function InputBox({
   onBlur,
   error = false,
   errorMessage = '',
+  required = false
 }) {
   const [touched, setTouched] = useState(false);
+ 
 
   const handleBlur = () => {
     setTouched(true);
-    onBlur && onBlur(); // Execute onBlur prop if provided
+    onBlur && onBlur(); 
   };
 
   return (
     <View style={styles.container}>
-      <Text style={styles.inputTitle}>{inputTitle}</Text>
+      <Text style={styles.inputTitle}>{inputTitle}{required && <Text style={{color: 'red', fontSize: 20}}>*</Text>}</Text>
       <TextInput
         style={[
           styles.inputBox,
@@ -47,7 +50,7 @@ function InputBox({
 const styles = StyleSheet.create({
   container: {
     width: '100%',
-    marginVertical: 10,
+    marginVertical: 8,
     paddingHorizontal: 20,
   },
   inputTitle: {
@@ -55,11 +58,12 @@ const styles = StyleSheet.create({
     marginBottom: 5,
     fontSize: 16,
     color: '#333',
+    fontFamily: fonts.POPPINS_BOLD
   },
   inputBox: {
-    height: 40,
+    height: 50,
     borderColor: '#ccc',
-    borderWidth: 1,
+    borderWidth: 2,
     borderRadius: 5,
     paddingHorizontal: 10,
   },

@@ -1,66 +1,73 @@
-import React, { useState } from 'react'
-import { Text, View, StyleSheet } from 'react-native'
-import DropDownPicker from 'react-native-dropdown-picker'
+import React, { useEffect, useState } from 'react';
+import { StyleSheet, Text, View } from 'react-native';
+import { Dropdown } from 'react-native-element-dropdown';
+import { fonts } from '../src/constant';
 
-export type itemsType = {
-    label: string;
-    id: number;
-    value: number;
+interface DropdownOption {
+  id: number;
+  label: string;
+
 }
 
-type Props = {
-    values: itemsType[];
-    dropdownTitle: string;
-    value: number | null;
-    onChangeValue: (value: number | null) => void;
+interface DropdownProps {
+  data: DropdownOption[];
+  title?: string;
+  onSelectValue: (option: DropdownOption) => void; // Pass selected option
 }
 
-function Dropdown({ dropdownTitle, values, value, onChangeValue }: Readonly<Props>) {
-  const [open, setOpen] = useState(false)
-  const [items, setItems] = useState<itemsType[]>(values.map(item => ({ ...item, value: item.id })))
+const DropdownComponent: React.FC<DropdownProps> = ({ data, title, onSelectValue }) => {
+  const [selectedOption, setSelectedOption] = useState<DropdownOption | null>(
+    data.find(option => option.id === 1) || null
+  );
+  const [isFocus, setIsFocus] = useState(false);
+
+
+
+  const handleDropdownChange = (option: DropdownOption) => {
+    setSelectedOption(option);
+    onSelectValue(option); 
+    setIsFocus(false);
+  };
+
+
 
   return (
     <View style={styles.container}>
-      <Text style={styles.dropdownTitle}>{dropdownTitle}</Text>
-      <DropDownPicker
-        open={open}
-        value={value}
-        items={items}
-        setOpen={setOpen}
-        setValue={(callback) => {
-          const newValue = typeof callback === 'function' ? callback(value) : callback
-          onChangeValue(newValue)
-        }}
-        setItems={setItems}
-        style={styles.picker}
-        dropDownContainerStyle={styles.dropDownContainer}
+      {title && <Text style={styles.title}>{title}<Text style={{color: 'red', fontSize: 20}}>*</Text></Text>}
+      <Dropdown
+        style={[styles.dropdown, isFocus && { borderColor: 'blue' }]}      
+        searchPlaceholder="Search..."
+        data={data}
+        maxHeight={300}
+        labelField="label"
+        valueField="id"
+        value={selectedOption}
+        onFocus={() => setIsFocus(true)}
+        onBlur={() => setIsFocus(false)}
+        onChange={(item) => handleDropdownChange(item)} 
       />
     </View>
-  )
-}
-
+  );
+};
 const styles = StyleSheet.create({
   container: {
-    width: '100%',
-    marginVertical: 10,
-    paddingHorizontal: 20,
+    backgroundColor: 'white',
+    padding: 16,
+    width: '99%',
   },
-  dropdownTitle: {
-    textAlign: 'left',
-    marginBottom: 5,
+  dropdown: {
+    height: 50,
+    borderColor: 'gray',
+    borderWidth: 1,
+    borderRadius: 8,
+    paddingHorizontal: 8,
+  },
+  title: {
     fontSize: 16,
     color: '#333',
+    marginBottom: 5,
+    fontFamily: fonts.POPPINS_BOLD
   },
-  picker: {
-    borderColor: '#ccc',
-    borderWidth: 1,
-    borderRadius: 5,
-  },
-  dropDownContainer: {
-    borderColor: '#ccc',
-    borderWidth: 1,
-    borderRadius: 5,
-  },
-})
+});
 
-export default Dropdown
+export default DropdownComponent;
