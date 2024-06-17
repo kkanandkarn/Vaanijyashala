@@ -10,18 +10,19 @@ function InputBox({
   placeholder,
   value,
   onChangeText,
-  onBlur,
+  // onBlur,
   error = false,
   errorMessage = '',
-  required = false
+  required = false,
+  editable= true
 }) {
   const [touched, setTouched] = useState(false);
  
 
-  const handleBlur = () => {
-    setTouched(true);
-    onBlur && onBlur(); 
-  };
+  // const handleBlur = () => {
+  //   setTouched(true);
+  //   onBlur && onBlur(); 
+  // };
 
   return (
     <View style={styles.container}>
@@ -30,7 +31,8 @@ function InputBox({
         style={[
           styles.inputBox,
           error && touched && styles.errorInputBox, 
-          error && !touched && styles.errorInputBox
+          error && !touched && styles.errorInputBox, 
+          !editable && styles.readOnlyText
         ]}
         autoCorrect={false}
         keyboardType={keyboardType}
@@ -39,7 +41,9 @@ function InputBox({
         placeholder={placeholder}
         value={value}
         onChangeText={onChangeText}
-        onBlur={handleBlur}
+        // onBlur={handleBlur}
+        editable={editable}
+        
       />
       {error && touched && <Text style={styles.errorMessage}>{errorMessage}</Text>}
       {error && !touched && <Text style={styles.errorMessage}>{errorMessage}</Text>}
@@ -51,7 +55,7 @@ const styles = StyleSheet.create({
   container: {
     width: '100%',
     marginVertical: 8,
-    paddingHorizontal: 20,
+    paddingHorizontal: 18,
   },
   inputTitle: {
     textAlign: 'left',
@@ -64,7 +68,7 @@ const styles = StyleSheet.create({
     height: 50,
     borderColor: '#ccc',
     borderWidth: 2,
-    borderRadius: 5,
+    borderRadius: 8,
     paddingHorizontal: 10,
   },
   errorInputBox: {
@@ -73,6 +77,10 @@ const styles = StyleSheet.create({
   errorMessage: {
     color: 'red',
   },
+  readOnlyText: {
+    color: 'gray',
+    fontWeight: 'bold'
+  }
 });
 
 export default InputBox;

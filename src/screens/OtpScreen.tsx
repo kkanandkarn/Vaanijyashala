@@ -18,6 +18,7 @@ function OtpScreen({navigation}: any) {
         const interval = setInterval(()=> {
             if(count == 0) {
                 clearInterval(interval)
+                
             } else {
                 setCount(count-1)
             }

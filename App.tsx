@@ -22,6 +22,9 @@ import {ToastComponent} from './components/ToastComponent';
 import LogIn from './src/screens/LogIn';
 import ForgetPassword from './src/screens/ForgetPassword';
 import RegisterSuccessfull from './src/screens/RegisterSuccessfull';
+import ProfileForm from './src/screens/ProfileForm';
+import MerchantProfileForm from './src/screens/MerchantProfileForm';
+
 
 const Stack = createNativeStackNavigator();
 
@@ -47,6 +50,8 @@ function App(): React.JSX.Element {
           <Stack.Screen name="OTP" component={OtpScreen} />
           <Stack.Screen name="GeneratePassword" component={GeneratePassword} />
           <Stack.Screen name="RegisterSuccessfull" component={RegisterSuccessfull} />
+          <Stack.Screen name="ProfileForm" component={ProfileForm} />
+          <Stack.Screen name="MerchantProfileForm" component={MerchantProfileForm} />
         </Stack.Navigator>
       </NavigationContainer>
       <ToastComponent />
