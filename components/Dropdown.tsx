@@ -1,12 +1,11 @@
-import React, { useEffect, useState } from 'react';
-import { StyleSheet, Text, View } from 'react-native';
-import { Dropdown } from 'react-native-element-dropdown';
-import { fonts } from '../src/constant';
+import React, {useEffect, useState} from 'react';
+import {StyleSheet, Text, View} from 'react-native';
+import {Dropdown} from 'react-native-element-dropdown';
+import {fonts} from '../src/constant';
 
 interface DropdownOption {
   id: number;
   label: string;
-
 }
 
 interface DropdownProps {
@@ -15,27 +14,32 @@ interface DropdownProps {
   onSelectValue: (option: DropdownOption) => void; // Pass selected option
 }
 
-const DropdownComponent: React.FC<DropdownProps> = ({ data, title, onSelectValue }) => {
+const DropdownComponent: React.FC<DropdownProps> = ({
+  data,
+  title,
+  onSelectValue,
+}) => {
   const [selectedOption, setSelectedOption] = useState<DropdownOption | null>(
-    data.find(option => option.id === 1) || null
+    data.find(option => option.id === 2) || null,
   );
   const [isFocus, setIsFocus] = useState(false);
 
-
-
   const handleDropdownChange = (option: DropdownOption) => {
     setSelectedOption(option);
-    onSelectValue(option); 
+    onSelectValue(option);
     setIsFocus(false);
   };
 
-
-
   return (
     <View style={styles.container}>
-      {title && <Text style={styles.title}>{title}<Text style={{color: 'red', fontSize: 20}}>*</Text></Text>}
+      {title && (
+        <Text style={styles.title}>
+          {title}
+          <Text style={{color: 'red', fontSize: 20}}>*</Text>
+        </Text>
+      )}
       <Dropdown
-        style={[styles.dropdown, isFocus && { borderColor: 'blue' }]}      
+        style={[styles.dropdown, isFocus && {borderColor: 'blue'}]}
         searchPlaceholder="Search..."
         data={data}
         maxHeight={300}
@@ -44,7 +48,7 @@ const DropdownComponent: React.FC<DropdownProps> = ({ data, title, onSelectValue
         value={selectedOption}
         onFocus={() => setIsFocus(true)}
         onBlur={() => setIsFocus(false)}
-        onChange={(item) => handleDropdownChange(item)} 
+        onChange={item => handleDropdownChange(item)}
       />
     </View>
   );
@@ -66,7 +70,7 @@ const styles = StyleSheet.create({
     fontSize: 16,
     color: '#333',
     marginBottom: 5,
-    fontFamily: fonts.POPPINS_BOLD
+    fontFamily: fonts.POPPINS_BOLD,
   },
 });
 

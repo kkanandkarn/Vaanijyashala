@@ -80,7 +80,8 @@ export interface State {
         { "id": 4, "label": "Home & Garden" },
         { "id": 5, "label": "Toys & Games" },
         { "id": 6, "label": "Others" }
-      ]
+      ],
+
        
   };
   

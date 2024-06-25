@@ -12,39 +12,59 @@ import {fonts} from '../constant';
 import {KeyboardAwareScrollView} from 'react-native-keyboard-aware-scroll-view';
 import InputBox from '../../components/InputBox';
 import Toast from 'react-native-toast-message';
-import { useDispatch } from 'react-redux';
-import { AppDispatch } from '../store';
-import { setFormData } from '../store/formSlice';
+import {useDispatch} from 'react-redux';
+import {AppDispatch} from '../store';
+import {setFormData} from '../store/formSlice';
+import * as Yup from 'yup';
+import {useAndroidBackButton} from '../../hooks/useAndroidButton';
+
+const ForgetSchema = Yup.object().shape({
+  email: Yup.string().email('Invalid email').required('Email is required'),
+});
+interface Errors {
+  [key: string]: string | undefined;
+}
 
 function ForgetPassword({navigation}: any) {
   const [email, setEmail] = useState('');
   const [emailError, setEmailError] = useState(false);
-const dispatch = useDispatch<AppDispatch>()
+  const [errors, setErrors] = useState<Errors>({});
+  const dispatch = useDispatch<AppDispatch>();
 
-  const submitForm = () => {
-   
-    if (email == '') {
-      setEmailError(true);
-    }
-    if (email !== '' ) {
-      setEmailError(false);
-      Toast.show({
-        type: 'info',
-        text1: 'OTP Sent.',
-      });
-      dispatch(setFormData({inputForm: 'forgetPasswordForm'}))
-      navigation.navigate('OTP');
+  const submitForm = async () => {
+    try {
+      await ForgetSchema.validate({email}, {abortEarly: false});
+      if (email !== '') {
+        setEmailError(false);
+        Toast.show({
+          type: 'info',
+          text1: 'OTP Sent.',
+        });
+        dispatch(setFormData({inputForm: 'forgetPasswordForm'}));
+        navigation.navigate('OTP');
+      }
+    } catch (err: any) {
+      const validationErrors: Errors = {};
+      if (err.inner && err.inner.length > 0) {
+        err.inner.forEach((error: Yup.ValidationError) => {
+          if (error.path) {
+            validationErrors[error.path] = error.message;
+          }
+        });
+      }
+      setErrors(validationErrors);
     }
   };
+  useAndroidBackButton(() => {
+    navigation.navigate('LogIn');
+  });
   return (
     <SafeAreaView style={{flex: 1, backgroundColor: 'white'}}>
       <View style={styles.headerContainer}>
         <Text style={styles.headerText}>LogIn</Text>
       </View>
 
-      <KeyboardAwareScrollView
-        style={{width: '100%', marginTop: 125}}
-        >
+      <KeyboardAwareScrollView style={{width: '100%', marginTop: 125}}>
         <Text style={styles.welcomeText}>Forget Password</Text>
 
         <InputBox
@@ -54,18 +74,15 @@ const dispatch = useDispatch<AppDispatch>()
           placeholder="Enter email"
           value={email}
           onChangeText={setEmail}
-          onBlur={() => setEmailError(email === '')}
-          error={emailError}
-          errorMessage={emailError ? 'Email is required' : ''}
+          error={!!errors.email}
+          errorMessage={errors.email ? errors.email : ''}
           required={true}
         />
-      
 
         <TouchableOpacity style={styles.button} onPress={submitForm}>
           <Text style={styles.buttonText}>Request OTP</Text>
         </TouchableOpacity>
       </KeyboardAwareScrollView>
-
     </SafeAreaView>
   );
 }
@@ -127,8 +144,6 @@ const styles = StyleSheet.create({
     marginTop: 10,
     color: 'red',
   },
-
- 
 });
 
 export default ForgetPassword;

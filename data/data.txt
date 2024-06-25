@@ -1,4 +1,10 @@
-/**
+ await AsyncStorage.setItem('login', 'true')
+          await AsyncStorage.setItem('username', formData.name)
+           await AsyncStorage.setItem('selectedImage', uri);
+
+
+
+           /**
  * Sample React Native App
  * https://github.com/facebook/react-native
  *
@@ -9,7 +15,7 @@ import {NavigationContainer} from '@react-navigation/native';
 import {createNativeStackNavigator} from '@react-navigation/native-stack';
 import React, {useEffect} from 'react';
 
-import SplashScreenS from 'react-native-splash-screen';
+import SplashScreen from 'react-native-splash-screen';
 
 import HomeScreen from './src/screens/HomeScreen';
 import SignUp from './src/screens/SignUp';
@@ -27,51 +33,60 @@ import MerchantProfileForm from './src/screens/MerchantProfileForm';
 import Dashboard from './src/screens/Dashboard';
 import SellerDashboard from './src/screens/MerchantScreens/SellerDashboard';
 import BottomStack from './src/screens/BottomStack/BottomStack';
-import SplashScreen from './src/screens/SplashScreen';
 
 const Stack = createNativeStackNavigator();
 
 function App(): React.JSX.Element {
   useEffect(() => {
     const timer = setTimeout(() => {
-      SplashScreenS.hide();
+      SplashScreen.hide();
     }, 1000);
 
     return () => clearTimeout(timer);
   }, []);
 
-  const OnBoardingStack = createNativeStackNavigator();
-  const OnBoarding = () => (
-    <OnBoardingStack.Navigator screenOptions={{headerShown: false}}>
-      <OnBoardingStack.Screen name="HomeScreen" component={HomeScreen} />
-      <OnBoardingStack.Screen name="SignUp" component={SignUp} />
-      <OnBoardingStack.Screen name="LogIn" component={LogIn} />
-      <OnBoardingStack.Screen
-        name="ForgetPassword"
-        component={ForgetPassword}
-      />
-      <OnBoardingStack.Screen name="OTP" component={OtpScreen} />
-      <OnBoardingStack.Screen
-        name="GeneratePassword"
-        component={GeneratePassword}
-      />
-      <OnBoardingStack.Screen
+  const onBoardingStack = createNativeStackNavigator();
+  const onBoarding = () => (
+    <onBoardingStack.Navigator screenOptions={{headerShown: false}}>
+
+      <onBoardingStack.Screen name="HomeScreen" component={HomeScreen} />
+      <onBoardingStack.Screen name="SignUp" component={SignUp} />
+      <onBoardingStack.Screen name="LogIn" component={LogIn} />
+      <onBoardingStack.Screen name="ForgetPassword" component={ForgetPassword} />
+      <onBoardingStack.Screen name="OTP" component={OtpScreen} />
+      <onBoardingStack.Screen name="GeneratePassword" component={GeneratePassword} />
+      <onBoardingStack.Screen
         name="RegisterSuccessfull"
         component={RegisterSuccessfull}
       />
-      <OnBoardingStack.Screen name="ProfileForm" component={ProfileForm} />
-      <OnBoardingStack.Screen
+      <onBoardingStack.Screen name="ProfileForm" component={ProfileForm} />
+      <onBoardingStack.Screen
         name="MerchantProfileForm"
         component={MerchantProfileForm}
       />
-    </OnBoardingStack.Navigator>
+     
+    </onBoardingStack.Navigator>
   );
   return (
     <Provider store={store}>
       <NavigationContainer>
         <Stack.Navigator screenOptions={{headerShown: false}}>
-          <Stack.Screen name="SplashScreen" component={SplashScreen} />
-          <Stack.Screen name="OnBoarding" component={OnBoarding} />
+          {/* <Stack.Screen name="BottomStack" component={BottomStack} /> */}
+          <Stack.Screen name="HomeScreen" component={HomeScreen} />
+          <Stack.Screen name="SignUp" component={SignUp} />
+          <Stack.Screen name="LogIn" component={LogIn} />
+          <Stack.Screen name="ForgetPassword" component={ForgetPassword} />
+          <Stack.Screen name="OTP" component={OtpScreen} />
+          <Stack.Screen name="GeneratePassword" component={GeneratePassword} />
+          <Stack.Screen
+            name="RegisterSuccessfull"
+            component={RegisterSuccessfull}
+          />
+          <Stack.Screen name="ProfileForm" component={ProfileForm} />
+          <Stack.Screen
+            name="MerchantProfileForm"
+            component={MerchantProfileForm}
+          />
           <Stack.Screen name="BottomStack" component={BottomStack} />
         </Stack.Navigator>
       </NavigationContainer>

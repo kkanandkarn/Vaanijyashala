@@ -8,8 +8,8 @@ import {
   Alert,
   Keyboard,
 } from 'react-native';
-import {useSelector} from 'react-redux';
-import {RootState} from '../store';
+import {useDispatch, useSelector} from 'react-redux';
+import {AppDispatch, RootState} from '../store';
 import {SafeAreaView} from 'react-native-safe-area-context';
 import {fonts} from '../constant';
 import {KeyboardAwareScrollView} from 'react-native-keyboard-aware-scroll-view';
@@ -20,6 +20,8 @@ import * as Yup from 'yup';
 import SearchableDropdown from '../../components/SearchableDropdown';
 import data, {State, District} from '../../data';
 import Toast from 'react-native-toast-message';
+import * as Progress from 'react-native-progress';
+import { setFormData } from '../store/formSlice';
 
 const ProfileFormSchema = Yup.object().shape({
   name: Yup.string().required('Name is required'),
@@ -36,22 +38,56 @@ interface Errors {
   [key: string]: string | undefined;
 }
 
-function ProfileForm() {
+function ProfileForm({navigation}:any) {
   const formData = useSelector((state: RootState) => state.form);
   const [name, setName] = useState(formData.name);
   const [email, setEmail] = useState(formData.email);
-  const [date, setDate] = useState('');
+  const [date, setDate] = useState(null);
   const [isDatePickerVisible, setDatePickerVisibility] = useState(false);
   const [gender, setGender] = useState(null);
   const [mobileNumber, setMobileNumber] = useState(null);
   const [altMobile, setAltMobile] = useState(null);
-  const [addressLine, setAddressLine] = useState('');
+  const [addressLine, setAddressLine] = useState(null);
   const [errors, setErrors] = useState<Errors>({}); // Initialize errors with the correct type
   const [state, setState] = useState<number | null>(null);
   const [districts, setDistricts] = useState<District[]>([]);
   const [district, setDistrict] = useState<number | null>(null);
   const [pinCode, setPinCode] = useState(null);
+  const [completedPer, setCompletedPer] = useState(0)
+  const dispatch = useDispatch<AppDispatch>();
+
+
  
+  const calculateProgress = () => {
+    const totalFields = 10; // Total number of input fields
+    let filledFields = 0;
+
+    // Count filled fields
+    if (name) filledFields++;
+    if (email) filledFields++;
+    if (date) filledFields++;
+    if  (mobileNumber) filledFields++;
+    if  (altMobile) filledFields++;
+    if (gender !== null) filledFields++;
+    if (addressLine) filledFields++;
+    if (state !== null) filledFields++;
+    if (district !== null) filledFields++;
+    if (pinCode) filledFields++;
+   
+    // Calculate progress percentage
+    const completedPercentage = (filledFields / totalFields) * 100
+    setCompletedPer(completedPercentage)
+
+  
+  };
+
+
+    useEffect(() => {
+    calculateProgress();
+ 
+  }, [name, email, date, mobileNumber, altMobile, gender, addressLine, state, district, pinCode]);
+
+
 
   const dropdownValues = [
     {id: 1, label: 'Male'},
@@ -99,6 +135,14 @@ function ProfileForm() {
     setDistrict(option.id);
   };
 
+  const handleLocation = () => {
+    Toast.show({
+        type: 'info',
+        text1: 'Geolocation is not available at this time.',
+         text2: 'Please enter location manually.'
+    })
+  }
+
   const handleSubmit = async () => {
     try {
       await ProfileFormSchema.validate(
@@ -123,6 +167,7 @@ function ProfileForm() {
         type: 'success',
         text1: "Profile details added"
      })
+navigation.navigate("SellerDashboard")
     } catch (err: any) {
       const validationErrors: Errors = {};
       if (err.inner && err.inner.length > 0) {
@@ -146,6 +191,20 @@ function ProfileForm() {
       <View style={styles.headerContainer}>
         <Text style={styles.headerText}>Profile Details</Text>
       </View>
+      <View style={{width: '90%', alignSelf: 'center'}}>
+      <Progress.Bar
+            progress={completedPer / 100} 
+            width={null} 
+            height={8} 
+            color={'#F45F20'} 
+            unfilledColor={'white'} 
+            borderWidth={1}
+            borderRadius={8}
+            borderColor={'#F45F20'}
+          />
+          <Text style={styles.completedPerText}>{completedPer}% completed</Text>
+      </View>
+     
       <KeyboardAwareScrollView
         style={{width: '100%', alignSelf: 'center', marginTop: 10}}
         contentContainerStyle={{
@@ -188,6 +247,7 @@ function ProfileForm() {
             errorMessage={errors.date ? errors.date : ''}
             required={true}
             editable={false}
+            isDate={true}
           />
         </TouchableOpacity>
 
@@ -272,7 +332,7 @@ function ProfileForm() {
           required={true}
         />
 
-        <TouchableOpacity style={styles.getLocation}>
+        <TouchableOpacity style={styles.getLocation} onPress={handleLocation}>
             <Image source={require('../../assets/img/find_location_icon.png')} style={styles.locationImage}/>
             <Text style={styles.getLocationText}>Use my current location</Text>
         </TouchableOpacity>
@@ -343,7 +403,14 @@ const styles = StyleSheet.create({
   locationImage: {
     width: 25,
     height: 25,
+  },
+  completedPerText: {
+    alignSelf: 'flex-end',
+    marginTop: 5,
+    fontFamily: fonts.POPPINS_REGULAR,
+    fontSize: 12
   }
+
 });
 
 export default ProfileForm;

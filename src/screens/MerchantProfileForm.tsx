@@ -7,9 +7,10 @@ import {
   View,
   Alert,
   Keyboard,
+  PermissionsAndroid,
 } from 'react-native';
-import {useSelector} from 'react-redux';
-import {RootState} from '../store';
+import {useDispatch, useSelector} from 'react-redux';
+import {AppDispatch, RootState} from '../store';
 import {SafeAreaView} from 'react-native-safe-area-context';
 import {fonts} from '../constant';
 import {KeyboardAwareScrollView} from 'react-native-keyboard-aware-scroll-view';
@@ -20,6 +21,11 @@ import * as Yup from 'yup';
 import SearchableDropdown from '../../components/SearchableDropdown';
 import data, {State, District} from '../../data';
 import Toast from 'react-native-toast-message';
+import * as Progress from 'react-native-progress';
+import {launchCamera} from 'react-native-image-picker';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import {useAndroidBackButton} from '../../hooks/useAndroidButton';
+import {CommonActions} from '@react-navigation/native';
 
 const ProfileFormSchema = Yup.object().shape({
   name: Yup.string().required('Name is required'),
@@ -37,7 +43,7 @@ interface Errors {
   [key: string]: string | undefined;
 }
 
-function MerchantProfileForm() {
+function MerchantProfileForm({navigation}: any) {
   const formData = useSelector((state: RootState) => state.form);
   const [name, setName] = useState(formData.name);
   const [email, setEmail] = useState(formData.email);
@@ -53,7 +59,57 @@ function MerchantProfileForm() {
   const [district, setDistrict] = useState<number | null>(null);
   const [shopCategory, setShopCategory] = useState<number | null>(null);
   const [pinCode, setPinCode] = useState(null);
-  const [gst, setGst] = useState('');
+  const [gst, setGst] = useState(null);
+  const [completedPer, setCompletedPer] = useState(0);
+  const [photo, setPhoto] = useState<string | null>(null);
+  useAndroidBackButton(() => {
+    navigation.dispatch(
+      CommonActions.reset({
+        index: 1,
+        routes: [{name: 'BottomStack'}],
+      }),
+    );
+  });
+
+  const calculateProgress = () => {
+    const totalFields = 12; // Total number of input fields
+    let filledFields = 0;
+
+    // Count filled fields
+    if (name) filledFields++;
+    if (email) filledFields++;
+    if (date) filledFields++;
+    if (mobileNumber) filledFields++;
+    if (altMobile) filledFields++;
+    if (gender !== null) filledFields++;
+    if (addressLine) filledFields++;
+    if (state !== null) filledFields++;
+    if (district !== null) filledFields++;
+    if (shopCategory) filledFields++;
+    if (pinCode) filledFields++;
+    if (gst) filledFields++;
+
+    // Calculate progress percentage
+    const completedPercentage = (filledFields / totalFields) * 100;
+    setCompletedPer(Math.round(completedPercentage));
+  };
+
+  useEffect(() => {
+    calculateProgress();
+  }, [
+    name,
+    email,
+    date,
+    mobileNumber,
+    altMobile,
+    gender,
+    addressLine,
+    state,
+    district,
+    shopCategory,
+    pinCode,
+    gst,
+  ]);
 
   const dropdownValues = [
     {id: 1, label: 'Male'},
@@ -70,12 +126,20 @@ function MerchantProfileForm() {
   };
   const getMinimumDate = () => {
     const today = new Date();
-    const minDate = new Date(today.getFullYear() - 18, today.getMonth(), today.getDate());
+    const minDate = new Date(
+      today.getFullYear() - 18,
+      today.getMonth(),
+      today.getDate(),
+    );
     return minDate;
   };
   const getDefaultDate = () => {
     const today = new Date();
-    const defaultDateValue = new Date(today.getFullYear() - 18, today.getMonth(), today.getDate());
+    const defaultDateValue = new Date(
+      today.getFullYear() - 18,
+      today.getMonth(),
+      today.getDate(),
+    );
     return defaultDateValue;
   };
 
@@ -103,10 +167,75 @@ function MerchantProfileForm() {
     setDistrict(option.id);
   };
 
+  const handleLocation = () => {
+    Toast.show({
+      type: 'info',
+      text1: 'Geolocation is not available at this time.',
+      text2: 'Please enter location manually.',
+    });
+  };
+
+  const requestCameraPermission = async () => {
+    try {
+      const granted = await PermissionsAndroid.request(
+        PermissionsAndroid.PERMISSIONS.CAMERA,
+        {
+          title: 'Camera Permission',
+          message: 'App needs camera permission',
+          buttonNeutral: 'Ask Me Later',
+          buttonNegative: 'Cancel',
+          buttonPositive: 'OK',
+        },
+      );
+      if (granted === PermissionsAndroid.RESULTS.GRANTED) {
+        launchCamera(
+          {
+            mediaType: 'photo',
+            saveToPhotos: true,
+          },
+          response => {
+            if (response.didCancel) {
+              console.log('User cancelled image picker');
+            } else if (response.errorCode) {
+              console.log('ImagePicker Error: ', response.errorMessage);
+            } else if (response.assets && response.assets.length > 0) {
+              const sourceUri = response.assets[0].uri;
+              if (sourceUri) {
+                console.log(response.assets);
+                setPhoto(sourceUri);
+              } else {
+                console.log('Photo URI is undefined');
+              }
+            }
+          },
+        );
+      } else {
+        console.log('Camera permission denied');
+        Toast.show({
+          type: 'error',
+          text1: 'Camera permission denied',
+          text2: 'Allow camera permission to capture image',
+        });
+      }
+    } catch (err) {
+      console.warn(err);
+    }
+  };
+
   const handleSubmit = async () => {
     try {
       await ProfileFormSchema.validate(
-        {name, email, date, gender, addressLine,shopCategory, state, district, pinCode},
+        {
+          name,
+          email,
+          date,
+          gender,
+          addressLine,
+          shopCategory,
+          state,
+          district,
+          pinCode,
+        },
         {abortEarly: false},
       );
 
@@ -121,12 +250,18 @@ function MerchantProfileForm() {
         state,
         district,
         pinCode,
-        gst
+        gst,
       });
-     Toast.show({
+      Toast.show({
         type: 'success',
-        text1: "Profile details added"
-     })
+        text1: 'Profile details added',
+      });
+      navigation.dispatch(
+        CommonActions.reset({
+          index: 1,
+          routes: [{name: 'BottomStack'}],
+        }),
+      );
     } catch (err: any) {
       const validationErrors: Errors = {};
       if (err.inner && err.inner.length > 0) {
@@ -137,18 +272,41 @@ function MerchantProfileForm() {
         });
       }
       setErrors(validationErrors);
-     
     }
   };
 
   return (
     <SafeAreaView style={{flex: 1, backgroundColor: 'white'}}>
-      <Image
-        source={require('../../assets/img/back_arrow.png')}
-        style={styles.backArrow}
-      />
+      <TouchableOpacity
+        onPress={() => {
+          navigation.dispatch(
+            CommonActions.reset({
+              index: 1,
+              routes: [{name: 'BottomStack'}],
+            }),
+          );
+        }}>
+        <Image
+          source={require('../../assets/img/back_arrow.png')}
+          style={styles.backArrow}
+        />
+      </TouchableOpacity>
+
       <View style={styles.headerContainer}>
-        <Text style={styles.headerText}>Merchant Details</Text>
+        <Text style={styles.headerText}>Seller Details</Text>
+      </View>
+      <View style={{width: '90%', alignSelf: 'center'}}>
+        <Progress.Bar
+          progress={completedPer / 100}
+          width={null}
+          height={8}
+          color={'#F45F20'}
+          unfilledColor={'white'}
+          borderWidth={1}
+          borderRadius={8}
+          borderColor={'#F45F20'}
+        />
+        <Text style={styles.completedPerText}>{completedPer}% completed</Text>
       </View>
       <KeyboardAwareScrollView
         style={{width: '100%', alignSelf: 'center', marginTop: 10}}
@@ -156,6 +314,25 @@ function MerchantProfileForm() {
           justifyContent: 'center',
           alignItems: 'center',
         }}>
+        <TouchableOpacity
+          style={styles.cameraButton}
+          onPress={requestCameraPermission}>
+          {photo ? (
+            <Image source={{uri: photo}} style={styles.capturedImage} />
+          ) : (
+            <Image
+              source={require('../../assets/img/camera_icon.png')}
+              style={styles.cameraImage}
+            />
+          )}
+          {photo && (
+            <Image
+              source={require('../../assets/img/camera_icon.png')}
+              style={styles.cameraEditIcon}
+            />
+          )}
+        </TouchableOpacity>
+
         <InputBox
           inputTitle="Name"
           autoComplete="name"
@@ -192,6 +369,7 @@ function MerchantProfileForm() {
             errorMessage={errors.date ? errors.date : ''}
             required={true}
             editable={false}
+            isDate={true}
           />
         </TouchableOpacity>
 
@@ -232,30 +410,26 @@ function MerchantProfileForm() {
           errorMessage={errors.altMobile ? errors.altMobile : ''}
         />
 
-       
-             <InputBox
-            inputTitle="Shop Locality"
-            autoComplete="off"
-            keyboardType="default"
-            placeholder="Enter Area, Street, Landmark"
-            value={addressLine}
-            onChangeText={setAddressLine}
-            error={!!errors.addressLine}
-            errorMessage={errors.addressLine ? errors.addressLine : ''}
-            required={true}
-          />
-         
-       
+        <InputBox
+          inputTitle="Shop Locality"
+          autoComplete="off"
+          keyboardType="default"
+          placeholder="Enter Area, Street, Landmark"
+          value={addressLine}
+          onChangeText={setAddressLine}
+          error={!!errors.addressLine}
+          errorMessage={errors.addressLine ? errors.addressLine : ''}
+          required={true}
+        />
+
         <SearchableDropdown
-            data={data.shopCategories}
-            title={'Shop Type'}
-            onSelectValue={handleShopCategory}
-            error={!!errors.shopCategory}
-            errorMessage={errors.shopCategory ? errors.shopCategory : ''}
-            placeholder="Choose Shop Type"
-          />
-     
-       
+          data={data.shopCategories}
+          title={'Shop Type'}
+          onSelectValue={handleShopCategory}
+          error={!!errors.shopCategory}
+          errorMessage={errors.shopCategory ? errors.shopCategory : ''}
+          placeholder="Choose Shop Type"
+        />
 
         <SearchableDropdown
           data={data.states}
@@ -287,21 +461,22 @@ function MerchantProfileForm() {
         />
 
         <InputBox
-            inputTitle="GST NO."
-            autoComplete="off"
-            keyboardType="default"
-            placeholder="Enter GST No."
-            value={gst}
-            onChangeText={setGst}
-            error={!!errors.gst}
-            errorMessage={errors.gst ? errors.gst : ''}
-           
-          />
-    
+          inputTitle="GST NO."
+          autoComplete="off"
+          keyboardType="default"
+          placeholder="Enter GST No."
+          value={gst}
+          onChangeText={setGst}
+          error={!!errors.gst}
+          errorMessage={errors.gst ? errors.gst : ''}
+        />
 
-    <TouchableOpacity style={styles.getLocation}>
-            <Image source={require('../../assets/img/find_location_icon.png')} style={styles.locationImage}/>
-            <Text style={styles.getLocationText}>Use my current location</Text>
+        <TouchableOpacity style={styles.getLocation} onPress={handleLocation}>
+          <Image
+            source={require('../../assets/img/find_location_icon.png')}
+            style={styles.locationImage}
+          />
+          <Text style={styles.getLocationText}>Use my current location</Text>
         </TouchableOpacity>
 
         <TouchableOpacity style={styles.button} onPress={handleSubmit}>
@@ -355,18 +530,48 @@ const styles = StyleSheet.create({
     height: 40,
     paddingHorizontal: 18,
     paddingVertical: 10,
-    marginTop: 15,   
+    marginTop: 15,
   },
   getLocationText: {
     fontSize: 15,
     marginLeft: 5,
     fontFamily: fonts.POPPINS_LIGHT,
-    color: 'white'
+    color: 'white',
   },
   locationImage: {
     width: 25,
     height: 25,
-  }
+  },
+  completedPerText: {
+    alignSelf: 'flex-end',
+    marginTop: 5,
+    fontFamily: fonts.POPPINS_REGULAR,
+    fontSize: 12,
+  },
+  cameraButton: {
+    backgroundColor: '#87CEEB',
+    width: 100,
+    height: 100,
+    borderRadius: 50,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  cameraImage: {
+    width: 40,
+    height: 40,
+  },
+  capturedImage: {
+    width: '100%',
+    height: '100%',
+    borderRadius: 50,
+  },
+  cameraEditIcon: {
+    position: 'absolute',
+    bottom: 5,
+    left: 70,
+    width: 35,
+    height: 35,
+  },
 });
 
 export default MerchantProfileForm;

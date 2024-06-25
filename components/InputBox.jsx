@@ -14,9 +14,12 @@ function InputBox({
   error = false,
   errorMessage = '',
   required = false,
-  editable= true
+  editable= true,
+  isDate = false
+  
 }) {
   const [touched, setTouched] = useState(false);
+  
  
 
   // const handleBlur = () => {
@@ -32,7 +35,8 @@ function InputBox({
           styles.inputBox,
           error && touched && styles.errorInputBox, 
           error && !touched && styles.errorInputBox, 
-          !editable && styles.readOnlyText
+          !editable && !isDate && styles.readOnlyText, 
+          isDate && styles.dateText
         ]}
         autoCorrect={false}
         keyboardType={keyboardType}
@@ -79,7 +83,13 @@ const styles = StyleSheet.create({
   },
   readOnlyText: {
     color: 'gray',
-    fontWeight: 'bold'
+    fontWeight: 'bold',
+    backgroundColor: '#EBEBE4'
+  },
+  dateText: {
+    fontWeight: 'bold',
+    color: '#333',
+    borderColor: '#ccc',
   }
 });
 

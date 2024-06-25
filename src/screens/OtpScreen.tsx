@@ -3,6 +3,7 @@ import { StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-nativ
 
 import { fonts } from '../constant'
 import Toast from 'react-native-toast-message';
+import { useAndroidBackButton } from '../../hooks/useAndroidButton';
 
 function OtpScreen({navigation}: any) {
     const et1 = useRef<TextInput>(null);
@@ -14,6 +15,7 @@ function OtpScreen({navigation}: any) {
     const [f3, setF3] = useState('')
     const [f4, setF4] = useState('')
     const [count, setCount] = useState(30)
+    useAndroidBackButton(()=> {})
     useEffect(()=> {
         const interval = setInterval(()=> {
             if(count == 0) {

@@ -14,26 +14,34 @@ import InputBox from '../../components/InputBox';
 import Toast from 'react-native-toast-message';
 import {useSelector} from 'react-redux';
 import {RootState} from '../store';
+import * as Yup from 'yup';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import {useAndroidBackButton} from '../../hooks/useAndroidButton';
+
+const ProfileFormSchema = Yup.object().shape({
+  password: Yup.string().required('Password is required'),
+  confirmPassword: Yup.string().required('Confirm Password is required'),
+});
+
+interface Errors {
+  [key: string]: string | undefined;
+}
 
 function GeneratePassword({navigation}: any) {
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [passwordError, setPasswordError] = useState(false);
   const [confirmPasswordError, setConfirmPasswordError] = useState(false);
+  const [errors, setErrors] = useState<Errors>({});
   const formData = useSelector((state: RootState) => state.form);
+  useAndroidBackButton(() => {});
 
-  const submitForm = () => {
-    if (password == '') {
-      setPasswordError(true);
-    }
-    if (confirmPassword == '') {
-      setConfirmPasswordError(true);
-    }
-
-    if (password !== '' && confirmPassword !== '') {
-      setPasswordError(false);
-      setConfirmPasswordError(false);
-      console.log(password, confirmPassword);
+  const submitForm = async () => {
+    try {
+      await ProfileFormSchema.validate(
+        {password, confirmPassword},
+        {abortEarly: false},
+      );
       if (password !== confirmPassword) {
         Toast.show({
           type: 'error',
@@ -46,6 +54,7 @@ function GeneratePassword({navigation}: any) {
             text1: 'Password Saved.',
           });
           navigation.navigate('RegisterSuccessfull');
+          await AsyncStorage.setItem('login', 'true');
         } else {
           Toast.show({
             type: 'success',
@@ -54,6 +63,16 @@ function GeneratePassword({navigation}: any) {
           navigation.navigate('LogIn');
         }
       }
+    } catch (err: any) {
+      const validationErrors: Errors = {};
+      if (err.inner && err.inner.length > 0) {
+        err.inner.forEach((error: Yup.ValidationError) => {
+          if (error.path) {
+            validationErrors[error.path] = error.message;
+          }
+        });
+      }
+      setErrors(validationErrors);
     }
   };
   return (
@@ -72,9 +91,8 @@ function GeneratePassword({navigation}: any) {
           placeholder="Enter Password"
           value={password}
           onChangeText={setPassword}
-          onBlur={() => setPasswordError(password === '')}
-          error={passwordError}
-          errorMessage={passwordError ? 'Password is required' : ''}
+          error={!!errors.password}
+          errorMessage={errors.password ? errors.password : ''}
           secureTextEntry={true}
           required={true}
         />
@@ -85,11 +103,8 @@ function GeneratePassword({navigation}: any) {
           placeholder="Confirm Password"
           value={confirmPassword}
           onChangeText={setConfirmPassword}
-          onBlur={() => setConfirmPasswordError(confirmPassword === '')}
-          error={confirmPasswordError}
-          errorMessage={
-            confirmPasswordError ? 'Confirm Password is required' : ''
-          }
+          error={!!errors.confirmPassword}
+          errorMessage={errors.confirmPassword ? errors.confirmPassword : ''}
           secureTextEntry={true}
           required={true}
         />

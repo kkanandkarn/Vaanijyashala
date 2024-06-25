@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, {useEffect, useState} from 'react';
 import {
   KeyboardAvoidingView,
   Platform,
@@ -7,35 +7,60 @@ import {
   Text,
   TouchableOpacity,
   View,
+  BackHandler,
 } from 'react-native';
 import {fonts} from '../constant';
 import {KeyboardAwareScrollView} from 'react-native-keyboard-aware-scroll-view';
 import InputBox from '../../components/InputBox';
 import Toast from 'react-native-toast-message';
+import * as yup from 'yup';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import {useAndroidBackButton} from '../../hooks/useAndroidButton';
+
+const LoginSchema = yup.object().shape({
+  email: yup.string().email('Invalid email').required('Email is required'),
+  password: yup.string().required('Password is required'),
+});
+interface Errors {
+  [key: string]: string | undefined;
+}
 
 function LogIn({navigation}: any) {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [emailError, setEmailError] = useState(false);
-  const [passwordError, setPasswordError] = useState(false);
+  const [errors, setErrors] = useState<Errors>({});
 
-  const submitForm = () => {
-    console.log(email, password);
-    if (email == '') {
-      setEmailError(true);
-    }
-    if (password == '') {
-      setPasswordError(true);
-    }
+  useEffect(() => {
+    const checkAuth = async () => {
+      const auth = await AsyncStorage.getItem('login');
+      if (auth) {
+        navigation.navigate('BottomStack');
+      }
+    };
 
-    if (email !== '' && password !== '') {
-      setEmailError(false);
-      setPasswordError(false);
+    checkAuth();
+  }, []);
+
+  useAndroidBackButton(() => {});
+  const submitForm = async () => {
+    try {
+      await LoginSchema.validate({email, password}, {abortEarly: false});
       Toast.show({
         type: 'success',
         text1: 'Login successfull',
       });
-      navigation.navigate('Home');
+      await AsyncStorage.setItem('login', 'true');
+      navigation.navigate('BottomStack');
+    } catch (err: any) {
+      const validationErrors: Errors = {};
+      if (err.inner && err.inner.length > 0) {
+        err.inner.forEach((error: yup.ValidationError) => {
+          if (error.path) {
+            validationErrors[error.path] = error.message;
+          }
+        });
+      }
+      setErrors(validationErrors);
     }
   };
   return (
@@ -44,9 +69,7 @@ function LogIn({navigation}: any) {
         <Text style={styles.headerText}>LogIn</Text>
       </View>
 
-      <KeyboardAwareScrollView
-        style={{width: '100%', marginTop: 125}}
-        >
+      <KeyboardAwareScrollView style={{width: '100%', marginTop: 125}}>
         <Text style={styles.welcomeText}>Welcome Back</Text>
 
         <InputBox
@@ -56,9 +79,8 @@ function LogIn({navigation}: any) {
           placeholder="Enter email"
           value={email}
           onChangeText={setEmail}
-          onBlur={() => setEmailError(email === '')}
-          error={emailError}
-          errorMessage={emailError ? 'Email is required' : ''}
+          error={!!errors.email}
+          errorMessage={errors.email ? errors.email : ''}
           required={true}
         />
         <InputBox
@@ -68,14 +90,17 @@ function LogIn({navigation}: any) {
           placeholder="Enter Password"
           value={password}
           onChangeText={setPassword}
-          onBlur={() => setPasswordError(password === '')}
-          error={passwordError}
-          errorMessage={passwordError ? 'Password is required' : ''}
+          error={!!errors.password}
+          errorMessage={errors.password ? errors.password : ''}
           required={true}
           secureTextEntry={true}
         />
 
-        <Text style={styles.forgetPasswordText} onPress={()=> navigation.navigate("ForgetPassword")}>Forget Password ?</Text>
+        <Text
+          style={styles.forgetPasswordText}
+          onPress={() => navigation.navigate('ForgetPassword')}>
+          Forget Password ?
+        </Text>
 
         <TouchableOpacity style={styles.button} onPress={submitForm}>
           <Text style={styles.buttonText}>Login</Text>

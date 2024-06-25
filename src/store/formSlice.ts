@@ -7,15 +7,16 @@ interface FormData {
     name: string;
     referralCode: string;
     isChecked: boolean;
+   
 }
 
 const initialState: FormData = {
-    selectedRole: 1,
+    selectedRole: 2,
     inputForm: '',
     email: '',
     name: '',
     referralCode: '',
-    isChecked: false
+    isChecked: false,
 }
 
 const formSlice = createSlice({

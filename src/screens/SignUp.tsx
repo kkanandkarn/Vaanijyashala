@@ -1,4 +1,4 @@
-import React, {useContext, useState} from 'react';
+import React, {useContext, useEffect, useState} from 'react';
 import {
   StyleSheet,
   Text,
@@ -19,15 +19,16 @@ import {AppDispatch, RootState} from '../store';
 import {setFormData} from '../store/formSlice';
 import Toast from 'react-native-toast-message';
 import * as yup from 'yup';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import {useAndroidBackButton} from '../../hooks/useAndroidButton';
 
 interface DropdownOption {
   id: number;
   label: string;
 }
 interface FormErrors {
-  [key: string]: string; 
+  [key: string]: string;
 }
-
 
 const SignUpSchema = yup.object().shape({
   name: yup.string().required('Name is required'),
@@ -36,48 +37,56 @@ const SignUpSchema = yup.object().shape({
 
 const SignUp: React.FC = ({navigation}: any) => {
   const dropdownValues = [
-    {id: 1, label: 'User'},
+    // {id: 1, label: 'User'},
     {id: 2, label: 'Seller/Merchant'},
   ];
 
   const formData = useSelector((state: RootState) => state.form);
   const dispatch = useDispatch<AppDispatch>();
+  // useEffect(() => {
+  //   const checkAuth = async () => {
+  //     const auth = await AsyncStorage.getItem('login');
+  //     if (auth) {
+  //       navigation.navigate('SellerDashboard');
+  //     }
+  //   };
 
-  const [nameError, setNameError] = useState(false);
-  const [emailError, setEmailError] = useState(false);
+  //   checkAuth();
+  // }, []);
+
   const [referralError, setReferralError] = useState(false);
   const [isAgreeError, setIsAgreeError] = useState(false);
   const [formErrors, setFormErrors] = useState<FormErrors>({});
+  useAndroidBackButton(() => {});
+
   const submitForm = async () => {
     try {
-   
-    if (!formData.isChecked) {
-      setIsAgreeError(true);
-    }
+      if (!formData.isChecked) {
+        setIsAgreeError(true);
+      }
 
-    await SignUpSchema.validate(formData, {abortEarly: false});
-    if (formData.isChecked) {
-      setIsAgreeError(false);
-      dispatch(setFormData({inputForm: 'registerForm'}));
-      Toast.show({
-        type: 'info',
-        text1: 'OTP Sent',
-      });
-      navigation.navigate('OTP');
+      await SignUpSchema.validate(formData, {abortEarly: false});
+      if (formData.isChecked) {
+        setIsAgreeError(false);
+        dispatch(setFormData({inputForm: 'registerForm'}));
+        Toast.show({
+          type: 'info',
+          text1: 'OTP Sent',
+        });
+        navigation.navigate('OTP');
+      }
+    } catch (error: any) {
+      if (error.name === 'ValidationError') {
+        // Validation failed
+        const errors: FormErrors = {};
+        error.inner.forEach((e: yup.ValidationError) => {
+          if (e.path) {
+            errors[e.path] = e.message;
+          }
+        });
+        setFormErrors(errors);
+      }
     }
-  } catch (error:any) {
-    if (error.name === 'ValidationError') {
-      // Validation failed
-      const errors: FormErrors = {};
-      error.inner.forEach((e: yup.ValidationError) => {
-        if (e.path) {
-          errors[e.path] = e.message;
-        }
-      });
-      setFormErrors(errors);
-
-    }
-  }
   };
 
   const handleCheckboxChange = (value: boolean) => {
@@ -116,8 +125,8 @@ const SignUp: React.FC = ({navigation}: any) => {
           placeholder="Enter Name"
           value={formData.name}
           onChangeText={(text: string) => dispatch(setFormData({name: text}))}
-          error={!!formErrors.name} 
-          errorMessage={formErrors.name || ''} 
+          error={!!formErrors.name}
+          errorMessage={formErrors.name || ''}
           required={true}
         />
 
@@ -128,7 +137,7 @@ const SignUp: React.FC = ({navigation}: any) => {
           placeholder="Enter email"
           value={formData.email}
           onChangeText={(text: string) => dispatch(setFormData({email: text}))}
-          error={!!formErrors.email} 
+          error={!!formErrors.email}
           errorMessage={formErrors.email || ''}
           required={true}
         />
