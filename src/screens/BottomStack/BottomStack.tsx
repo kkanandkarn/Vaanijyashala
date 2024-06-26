@@ -6,6 +6,7 @@ import {useAndroidBackButton} from '../../../hooks/useAndroidButton';
 import {BackHandler, Image, StyleSheet} from 'react-native';
 import images from '../../../assets';
 import Employees from '../MerchantScreens/Employees';
+import {SafeAreaView} from 'react-native-safe-area-context';
 
 const Tab = createBottomTabNavigator();
 

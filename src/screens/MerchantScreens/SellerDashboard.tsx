@@ -1,9 +1,10 @@
-import React, {useEffect, useState} from 'react';
+import React, {useState} from 'react';
 import {
-  BackHandler,
-  Button,
+  Alert,
   Image,
   ImageBackground,
+  Modal,
+  Pressable,
   SafeAreaView,
   StyleSheet,
   Text,
@@ -11,12 +12,14 @@ import {
   View,
 } from 'react-native';
 import {KeyboardAwareScrollView} from 'react-native-keyboard-aware-scroll-view';
-import {useAndroidBackButton} from '../../../hooks/useAndroidButton';
 import images from '../../../assets';
 import {fonts} from '../../constant';
+import Header from './Header';
 
 function SellerDashboard({navigation}: any) {
   const [username, setUsername] = useState('User');
+  const [modalVisible, setModalVisible] = useState(false);
+
   return (
     <SafeAreaView style={{flex: 1, backgroundColor: 'white'}}>
       <KeyboardAwareScrollView style={{width: '100%'}}>
@@ -34,7 +37,7 @@ function SellerDashboard({navigation}: any) {
               : `Hi, ${username}!`}
           </Text>
           <View style={styles.uniqueIdContainer}>
-            <Text style={styles.uniqueId}>VSM101</Text>
+            <Text style={styles.uniqueId}>VSM1001</Text>
           </View>
         </View>
         <Text style={styles.headLine}>Let's earn more.</Text>
@@ -55,24 +58,28 @@ function SellerDashboard({navigation}: any) {
               <View style={styles.infoContainer2}>
                 <View>
                   <Text style={styles.ASProductText}>Active Products</Text>
-                  <Text style={styles.ASProductAmount}>20</Text>
+                  <Text style={styles.ASProductAmount}>14</Text>
                 </View>
                 <View>
                   <Text style={styles.ASProductText}>Sold Products</Text>
-                  <Text style={styles.ASProductAmount}>7</Text>
+                  <Text style={styles.ASProductAmount}>6</Text>
                 </View>
               </View>
             </ImageBackground>
           </View>
-          <TouchableOpacity style={styles.plusContainer}>
+          <TouchableOpacity
+            style={styles.plusContainer}
+            onPress={() => navigation.navigate('DashboardModal')}>
             <Text style={styles.plusIcon}>+</Text>
           </TouchableOpacity>
         </View>
-        <TouchableOpacity style={styles.totalProductsContainer}>
+        <TouchableOpacity
+          style={styles.totalProductsContainer}
+          onPress={() => navigation.navigate('ProductHistory')}>
           <Text style={styles.totalProductsHeading}>Total Products</Text>
           <Text style={styles.totalProductsText}>No. of Products Added.</Text>
           <View style={styles.totalProductPress}>
-            <Text style={styles.totalProductsAmount}>27</Text>
+            <Text style={styles.totalProductsAmount}>20</Text>
             <Image
               source={images.White_Forward_Arrow}
               style={styles.forwardArrow}

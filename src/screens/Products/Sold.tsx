@@ -1,29 +1,33 @@
 import React, {useState} from 'react';
-import {FlatList, Image, StyleSheet, Text, TextInput, View} from 'react-native';
+import {
+  FlatList,
+  Image,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
+} from 'react-native';
 import {SafeAreaView} from 'react-native-safe-area-context';
-import Header from './Header';
-import data from '../../../data';
-import {TouchableOpacity} from 'react-native-gesture-handler';
+import InputBox from '../../../components/InputBox';
+import {TextInput} from 'react-native-gesture-handler';
 import images from '../../../assets';
 import {fonts} from '../../constant';
+import data from '../../../data';
 
-function Employees() {
+function Sold() {
   const [search, setSearch] = useState('');
-  const [filteredProducts, setFilteredProducts] = useState(data.Employees);
-
+  const [filteredProducts, setFilteredProducts] = useState(data.SoldProducts);
   const handleSearch = (text: any) => {
     setSearch(text);
     if (text) {
-      const newData = data.Employees.filter(
+      const newData = data.SoldProducts.filter(
         item =>
           item.name.toLowerCase().includes(text.toLowerCase()) ||
-          item.EmployeeId.toLowerCase().includes(text.toLowerCase()) ||
-          item.email.toLowerCase().includes(text.toLowerCase()) ||
-          item.mobileNumber.toLowerCase().includes(text.toLowerCase()),
+          item.productId.toLowerCase().includes(text.toLowerCase()),
       );
       setFilteredProducts(newData);
     } else {
-      setFilteredProducts(data.Employees);
+      setFilteredProducts(data.SoldProducts);
     }
   };
   const renderItem = ({item}: any) => (
@@ -31,16 +35,7 @@ function Employees() {
       onPress={() => console.log(item.id)}
       style={[
         styles.itemContainer,
-        {
-          backgroundColor:
-            item.status === 'Active'
-              ? '#90EE90'
-              : item.status === 'Hold'
-              ? '#CCC'
-              : item.status === 'Suspended'
-              ? '#F2D2BD'
-              : '#E65629',
-        },
+        {backgroundColor: item.status === 'Active' ? '#CCC' : '#F2D2BD'},
       ]}>
       <View style={styles.groupText}>
         <Text style={[styles.itemText, {fontWeight: 'bold'}]}>
@@ -49,33 +44,20 @@ function Employees() {
             : item.name}
         </Text>
         <Text style={[styles.itemText, {color: '#E65629', fontWeight: '600'}]}>
-          {item.EmployeeId}
+          {item.productId}
         </Text>
       </View>
       <View style={styles.groupText}>
+        <Text style={styles.itemText}>Qty: {item.qty}</Text>
         <Text style={styles.itemText}>
-          {' '}
-          {item.email.length > 25
-            ? `${item.email.substring(0, 25)}...`
-            : item.email}
+          &#x20B9; {item.price.toLocaleString()}
         </Text>
-        <Text style={styles.itemText}>{item.mobileNumber}</Text>
       </View>
       <View style={styles.groupText}>
         <Text
           style={[
             styles.itemText,
-            {
-              color:
-                item.status === 'Active'
-                  ? 'green'
-                  : item.status === 'Hold'
-                  ? '#E65629'
-                  : item.status === 'Suspended'
-                  ? 'red'
-                  : '#E65629',
-              fontWeight: '600',
-            },
+            {color: item.status === 'Active' ? 'green' : '#E65629'},
           ]}>
           {item.status}
         </Text>
@@ -83,9 +65,7 @@ function Employees() {
     </TouchableOpacity>
   );
   return (
-    <SafeAreaView
-      style={{backgroundColor: 'white', height: '100%', paddingHorizontal: 15}}>
-      <Header header={'Employees'} />
+    <SafeAreaView style={{backgroundColor: 'white', height: '100%'}}>
       <View style={styles.searchBox}>
         <TextInput
           keyboardType="default"
@@ -97,6 +77,7 @@ function Employees() {
         />
         <Image source={images.searchIcon} style={styles.searchIcon} />
       </View>
+
       {filteredProducts.length ? (
         <FlatList
           data={filteredProducts}
@@ -160,4 +141,5 @@ const styles = StyleSheet.create({
     marginTop: 20,
   },
 });
-export default Employees;
+
+export default Sold;

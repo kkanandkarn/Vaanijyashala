@@ -81,7 +81,66 @@ export interface State {
         { "id": 5, "label": "Toys & Games" },
         { "id": 6, "label": "Others" }
       ],
-
+      Products: [
+        {id: 1, productId: 'VSP101', name: 'Samsung Television 50g hybrid runns on both inverter and electricity', qty: 10, price: 10000, status: 'Active'},
+        {id: 2, productId: 'VSP102', name: 'Whirpool Washing machine', qty: 5, price: 7000, status: 'Sold'},
+        {id: 3, productId: 'VSP103', name: 'Bajaj Grinder', qty: 8, price: 2000, status: 'Active'},
+        {id: 4, productId: 'VSP104', name: 'Sony Sound System', qty: 15, price: 15000, status: 'Active'},
+        {id: 5, productId: 'VSP105', name: 'LG Refrigerator', qty: 7, price: 12000, status: 'Sold'},
+        {id: 6, productId: 'VSP106', name: 'Philips Mixer', qty: 20, price: 2500, status: 'Active'},
+        {id: 7, productId: 'VSP107', name: 'Panasonic Microwave', qty: 10, price: 8000, status: 'Active'},
+        {id: 8, productId: 'VSP108', name: 'Dell Laptop', qty: 5, price: 50000, status: 'Active'},
+        {id: 9, productId: 'VSP109', name: 'HP Printer', qty: 12, price: 6000, status: 'Sold'},
+        {id: 10, productId: 'VSP110', name: 'Canon Camera', qty: 9, price: 25000, status: 'Active'},
+        {id: 11, productId: 'VSP111', name: 'JBL Headphones', qty: 30, price: 2000, status: 'Active'},
+        {id: 12, productId: 'VSP112', name: 'Apple iPhone 13', qty: 3, price: 70000, status: 'Sold'},
+        {id: 13, productId: 'VSP113', name: 'Samsung Galaxy Tab', qty: 6, price: 30000, status: 'Active'},
+        {id: 14, productId: 'VSP114', name: 'Nokia Mobile', qty: 20, price: 5000, status: 'Active'},
+        {id: 15, productId: 'VSP115', name: 'Lenovo Tablet', qty: 8, price: 15000, status: 'Sold'},
+        {id: 16, productId: 'VSP116', name: 'Mi Smart Band', qty: 25, price: 2000, status: 'Active'},
+        {id: 17, productId: 'VSP117', name: 'Asus Router', qty: 15, price: 3500, status: 'Active'},
+        {id: 18, productId: 'VSP118', name: 'Bose Speaker', qty: 10, price: 10000, status: 'Sold'},
+        {id: 19, productId: 'VSP119', name: 'Sony PlayStation 5', qty: 4, price: 50000, status: 'Active'},
+        {id: 20, productId: 'VSP120', name: 'Microsoft Surface Pro', qty: 7, price: 60000, status: 'Active'}
+      ],
+      ActiveProducts: [
+        {id: 1, productId: 'VSP101', name: 'Samsung Television 50g hybrid runns on both inverter and electricity', qty: 10, price: 10000, status: 'Active'},
+      
+        {id: 3, productId: 'VSP103', name: 'Bajaj Grinder', qty: 8, price: 2000, status: 'Active'},
+        {id: 4, productId: 'VSP104', name: 'Sony Sound System', qty: 15, price: 15000, status: 'Active'},
+       
+        {id: 6, productId: 'VSP106', name: 'Philips Mixer', qty: 20, price: 2500, status: 'Active'},
+        {id: 7, productId: 'VSP107', name: 'Panasonic Microwave', qty: 10, price: 8000, status: 'Active'},
+        {id: 8, productId: 'VSP108', name: 'Dell Laptop', qty: 5, price: 50000, status: 'Active'},
+      
+        {id: 10, productId: 'VSP110', name: 'Canon Camera', qty: 9, price: 25000, status: 'Active'},
+        {id: 11, productId: 'VSP111', name: 'JBL Headphones', qty: 30, price: 2000, status: 'Active'},
+      
+        {id: 13, productId: 'VSP113', name: 'Samsung Galaxy Tab', qty: 6, price: 30000, status: 'Active'},
+        {id: 14, productId: 'VSP114', name: 'Nokia Mobile', qty: 20, price: 5000, status: 'Active'},
+      
+        {id: 16, productId: 'VSP116', name: 'Mi Smart Band', qty: 25, price: 2000, status: 'Active'},
+        {id: 17, productId: 'VSP117', name: 'Asus Router', qty: 15, price: 3500, status: 'Active'},
+    
+        {id: 19, productId: 'VSP119', name: 'Sony PlayStation 5', qty: 4, price: 50000, status: 'Active'},
+        {id: 20, productId: 'VSP120', name: 'Microsoft Surface Pro', qty: 7, price: 60000, status: 'Active'}
+      ],
+      SoldProducts: [
+        {id: 2, productId: 'VSP102', name: 'Whirpool Washing machine', qty: 5, price: 7000, status: 'Sold'},
+        {id: 5, productId: 'VSP105', name: 'LG Refrigerator', qty: 7, price: 12000, status: 'Sold'},
+        {id: 9, productId: 'VSP109', name: 'HP Printer', qty: 12, price: 6000, status: 'Sold'},
+        {id: 12, productId: 'VSP112', name: 'Apple iPhone 13', qty: 3, price: 70000, status: 'Sold'},
+        {id: 15, productId: 'VSP115', name: 'Lenovo Tablet', qty: 8, price: 15000, status: 'Sold'},
+        {id: 18, productId: 'VSP118', name: 'Bose Speaker', qty: 10, price: 10000, status: 'Sold'},
+      ],
+      Employees: [
+        {id: 1, EmployeeId: 'VSE101', name: 'Guru Sharan Kumar Ram', email: 'askgurusharan@gmail.com', mobileNumber: '', status: 'Active'},
+        {id: 2, EmployeeId: 'VSE102', name: 'Akash Chauhan', email: 'akash.chahun@gmail.com', mobileNumber: '9521457896', status: 'Hold'},
+        {id: 3, EmployeeId: 'VSE103', name: 'Suhana Singh', email: 'suhan3459@gmail.com', mobileNumber: '', status: 'Active'},
+        {id: 4, EmployeeId: 'VSE104', name: 'Rajat Kumar', email: '', mobileNumber: '9658789654', status: 'Suspended'},
+       
+      ]
+      
        
   };
   

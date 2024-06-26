@@ -28,6 +28,8 @@ import Dashboard from './src/screens/Dashboard';
 import SellerDashboard from './src/screens/MerchantScreens/SellerDashboard';
 import BottomStack from './src/screens/BottomStack/BottomStack';
 import SplashScreen from './src/screens/SplashScreen';
+import DashboardModal from './components/DashboardModal';
+import ProductHistory from './src/screens/Products/ProductHistory';
 
 const Stack = createNativeStackNavigator();
 
@@ -70,9 +72,22 @@ function App(): React.JSX.Element {
     <Provider store={store}>
       <NavigationContainer>
         <Stack.Navigator screenOptions={{headerShown: false}}>
-          <Stack.Screen name="SplashScreen" component={SplashScreen} />
-          <Stack.Screen name="OnBoarding" component={OnBoarding} />
-          <Stack.Screen name="BottomStack" component={BottomStack} />
+          <Stack.Group>
+            <Stack.Screen name="SplashScreen" component={SplashScreen} />
+            <Stack.Screen name="OnBoarding" component={OnBoarding} />
+            <Stack.Screen name="BottomStack" component={BottomStack} />
+            <Stack.Screen name="ProductHistory" component={ProductHistory} />
+          </Stack.Group>
+          <Stack.Group screenOptions={{presentation: 'transparentModal'}}>
+            <Stack.Screen
+              name="DashboardModal"
+              component={DashboardModal}
+              options={{
+                animation: 'slide_from_bottom',
+                headerShown: false,
+              }}
+            />
+          </Stack.Group>
         </Stack.Navigator>
       </NavigationContainer>
       <ToastComponent />
