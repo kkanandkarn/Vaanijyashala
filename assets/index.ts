@@ -15,6 +15,8 @@ Cross_Icon: require('./img/cross.png'),
 Products_Icon: require('./img/Products_Icon.png'),
 Back_Arrow: require('./img/back_arrow.png'),
 searchIcon: require('./img/search_icon.png'),
+Profile_Background: require('./img/profile_background.jpg'),
+Right_Half_Arrow: require('./img/right_half_arrow.png'),
 }
 
 export default images

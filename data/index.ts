@@ -137,8 +137,13 @@ export interface State {
         {id: 1, EmployeeId: 'VSE101', name: 'Guru Sharan Kumar Ram', email: 'askgurusharan@gmail.com', mobileNumber: '', status: 'Active'},
         {id: 2, EmployeeId: 'VSE102', name: 'Akash Chauhan', email: 'akash.chahun@gmail.com', mobileNumber: '9521457896', status: 'Hold'},
         {id: 3, EmployeeId: 'VSE103', name: 'Suhana Singh', email: 'suhan3459@gmail.com', mobileNumber: '', status: 'Active'},
-        {id: 4, EmployeeId: 'VSE104', name: 'Rajat Kumar', email: '', mobileNumber: '9658789654', status: 'Suspended'},
-       
+        {id: 4, EmployeeId: 'VSE104', name: 'Rajat Kumar', email: '', mobileNumber: '9658789654', status: 'Suspended'},       
+      ],
+      Ledger: [
+        {id: 1, message: 'Bajaj Grinder #VSP103 sold from App',  amount: 4000, user: "Guru Sharan Kumar Ram", Qty: 2, dateTime: "26 June 2024 5:40:00 PM", type: "sold"},
+        {id: 2, message: 'Samsung Television 50g hybrid runns on both inverter and electricity #VSP101 sold from App',  amount: 10000, user: "Suhana Singh", Qty: 1, dateTime: "25 June 2024 02:33:00 PM", type: "sold"},
+        {id: 3, message: 'Microsoft Surface Pro #VSP120 added to app',  amount: 120000, user: "Suhana Singh", Qty: 2, dateTime: "26 June 2024 11:22:00 AM", type: "add"},
+      
       ]
       
        

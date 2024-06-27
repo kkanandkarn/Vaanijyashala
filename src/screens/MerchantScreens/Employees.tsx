@@ -84,12 +84,12 @@ function Employees() {
   );
   return (
     <SafeAreaView
-      style={{backgroundColor: 'white', height: '100%', paddingHorizontal: 15}}>
+      style={{backgroundColor: 'white', height: '100%', paddingHorizontal: 20}}>
       <Header header={'Employees'} />
       <View style={styles.searchBox}>
         <TextInput
           keyboardType="default"
-          placeholder={'Search by Product name or Product Id'}
+          placeholder={'Search by name, id, email or mobile'}
           value={search}
           onChangeText={handleSearch}
           style={styles.inputBox}

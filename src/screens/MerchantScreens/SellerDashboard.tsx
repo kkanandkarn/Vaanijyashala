@@ -17,7 +17,7 @@ import {fonts} from '../../constant';
 import Header from './Header';
 
 function SellerDashboard({navigation}: any) {
-  const [username, setUsername] = useState('User');
+  const [username, setUsername] = useState('Anand Kumar Karn');
   const [modalVisible, setModalVisible] = useState(false);
 
   return (

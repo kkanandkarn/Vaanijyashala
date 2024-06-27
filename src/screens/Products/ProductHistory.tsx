@@ -71,7 +71,7 @@ const ProductHistory = ({navigation}: any) => {
 
   return (
     <SafeAreaView style={styles.container}>
-      <View style={{paddingHorizontal: 5}}>
+      <View style={{paddingHorizontal: 10}}>
         <Header navigation={navigation} />
       </View>
       <StatusBar barStyle="dark-content" backgroundColor={'white'} />
@@ -99,7 +99,7 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: 'white',
-    paddingHorizontal: 10,
+    paddingHorizontal: 20,
   },
 
   segmentView: {
