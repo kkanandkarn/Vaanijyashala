@@ -18,11 +18,23 @@ import * as Yup from 'yup';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import {useAndroidBackButton} from '../../hooks/useAndroidButton';
 
-const ProfileFormSchema = Yup.object().shape({
-  password: Yup.string().required('Password is required'),
-  confirmPassword: Yup.string().required('Confirm Password is required'),
-});
+const passwordValidation = Yup.string()
+  .required('Password is required')
+  .min(8, 'Password should be at least 8 characters long')
+  .matches(/[0-9]/, 'Password must include at least one number')
+  .matches(/[A-Z]/, 'Password must include at least one uppercase letter')
+  .matches(/[a-z]/, 'Password must include at least one lowercase letter')
+  .matches(
+    /[!@#$%^&*(),.?":{}|<>]/,
+    'Password must include at least one special character',
+  );
 
+const ProfileFormSchema = Yup.object().shape({
+  password: passwordValidation,
+  confirmPassword: Yup.string()
+    .required('Confirm Password is required')
+    .oneOf([Yup.ref('password'), ''], 'Passwords must match Confirm Password'),
+});
 interface Errors {
   [key: string]: string | undefined;
 }
@@ -112,6 +124,27 @@ function GeneratePassword({navigation}: any) {
         <TouchableOpacity style={styles.button} onPress={submitForm}>
           <Text style={styles.buttonText}>Submit</Text>
         </TouchableOpacity>
+        <View style={styles.suggestions}>
+          <Text style={styles.suggestionText}>
+            - Password should be at least 8 characters long
+          </Text>
+          <Text style={styles.suggestionText}>
+            - Password must include at least one uppercase letter
+          </Text>
+          <Text style={styles.suggestionText}>
+            - Password must include at least one lowercase letter
+          </Text>
+          <Text style={styles.suggestionText}>
+            - Password must include at least one special character
+          </Text>
+          <Text style={styles.suggestionText}>
+            - Password must include at least one number
+          </Text>
+          <Text style={styles.suggestionText}>
+            - Passwords must match Confirm Password
+          </Text>
+          <Text style={styles.suggestionText}>- For example: Abc@1234</Text>
+        </View>
       </KeyboardAwareScrollView>
     </SafeAreaView>
   );
@@ -173,6 +206,14 @@ const styles = StyleSheet.create({
   isAgreeError: {
     marginTop: 10,
     color: 'red',
+  },
+  suggestions: {
+    padding: 20,
+  },
+  suggestionText: {
+    fontFamily: fonts.POPPINS_REGULAR,
+    fontSize: 13,
+    color: '#2F2C2A',
   },
 });
 

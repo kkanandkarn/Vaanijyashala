@@ -7,6 +7,7 @@ import {
   KeyboardAvoidingView,
   Platform,
   SafeAreaView,
+  BackHandler,
 } from 'react-native';
 import {fonts} from '../constant';
 import InputBox from '../../components/InputBox';
@@ -43,21 +44,13 @@ const SignUp: React.FC = ({navigation}: any) => {
 
   const formData = useSelector((state: RootState) => state.form);
   const dispatch = useDispatch<AppDispatch>();
-  // useEffect(() => {
-  //   const checkAuth = async () => {
-  //     const auth = await AsyncStorage.getItem('login');
-  //     if (auth) {
-  //       navigation.navigate('SellerDashboard');
-  //     }
-  //   };
-
-  //   checkAuth();
-  // }, []);
 
   const [referralError, setReferralError] = useState(false);
   const [isAgreeError, setIsAgreeError] = useState(false);
   const [formErrors, setFormErrors] = useState<FormErrors>({});
-  useAndroidBackButton(() => {});
+  useAndroidBackButton(() => {
+    BackHandler.exitApp();
+  });
 
   const submitForm = async () => {
     try {
@@ -106,7 +99,7 @@ const SignUp: React.FC = ({navigation}: any) => {
       </View>
 
       <KeyboardAwareScrollView
-        style={{width: '100%', alignSelf: 'center', marginTop: 50}}
+        style={{width: '100%', alignSelf: 'flex-start', marginTop: 50}}
         contentContainerStyle={{
           justifyContent: 'center',
           alignItems: 'center',
@@ -246,6 +239,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     marginTop: 10,
+    width: '90%',
   },
   checkBoxText: {
     marginLeft: 10,

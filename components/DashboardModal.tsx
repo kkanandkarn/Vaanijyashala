@@ -31,7 +31,14 @@ function DashboardModal({navigation}: any) {
         </View>
 
         <View style={styles.bottonsContainer}>
-          <TouchableOpacity style={styles.bottons}>
+          <TouchableOpacity
+            style={styles.bottons}
+            onPress={() =>
+              navigation.navigate('AddEmployee', {
+                method: 'ADD',
+                id: null,
+              })
+            }>
             <Image source={images.Group_Users} style={styles.IconImage1} />
             <Text style={styles.IconText}>Employee</Text>
           </TouchableOpacity>

@@ -1,137 +1,19 @@
- await AsyncStorage.setItem('login', 'true')
-          await AsyncStorage.setItem('username', formData.name)
-           await AsyncStorage.setItem('selectedImage', uri);
-
-
-
-           /**
- * Sample React Native App
- * https://github.com/facebook/react-native
- *
- * @format
- */
-import 'react-native-gesture-handler';
-import {NavigationContainer} from '@react-navigation/native';
-import {createNativeStackNavigator} from '@react-navigation/native-stack';
-import React, {useEffect} from 'react';
-
-import SplashScreen from 'react-native-splash-screen';
-
-import HomeScreen from './src/screens/HomeScreen';
-import SignUp from './src/screens/SignUp';
-
-import OtpScreen from './src/screens/OtpScreen';
-import GeneratePassword from './src/screens/GeneratePassword';
-import {Provider} from 'react-redux';
-import store from './src/store';
-import {ToastComponent} from './components/ToastComponent';
-import LogIn from './src/screens/LogIn';
-import ForgetPassword from './src/screens/ForgetPassword';
-import RegisterSuccessfull from './src/screens/RegisterSuccessfull';
-import ProfileForm from './src/screens/ProfileForm';
-import MerchantProfileForm from './src/screens/MerchantProfileForm';
-import Dashboard from './src/screens/Dashboard';
-import SellerDashboard from './src/screens/MerchantScreens/SellerDashboard';
-import BottomStack from './src/screens/BottomStack/BottomStack';
-
-const Stack = createNativeStackNavigator();
-
-function App(): React.JSX.Element {
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      SplashScreen.hide();
-    }, 1000);
-
-    return () => clearTimeout(timer);
-  }, []);
-
-  const onBoardingStack = createNativeStackNavigator();
-  const onBoarding = () => (
-    <onBoardingStack.Navigator screenOptions={{headerShown: false}}>
-
-      <onBoardingStack.Screen name="HomeScreen" component={HomeScreen} />
-      <onBoardingStack.Screen name="SignUp" component={SignUp} />
-      <onBoardingStack.Screen name="LogIn" component={LogIn} />
-      <onBoardingStack.Screen name="ForgetPassword" component={ForgetPassword} />
-      <onBoardingStack.Screen name="OTP" component={OtpScreen} />
-      <onBoardingStack.Screen name="GeneratePassword" component={GeneratePassword} />
-      <onBoardingStack.Screen
-        name="RegisterSuccessfull"
-        component={RegisterSuccessfull}
-      />
-      <onBoardingStack.Screen name="ProfileForm" component={ProfileForm} />
-      <onBoardingStack.Screen
-        name="MerchantProfileForm"
-        component={MerchantProfileForm}
-      />
-     
-    </onBoardingStack.Navigator>
-  );
-  return (
-    <Provider store={store}>
-      <NavigationContainer>
-        <Stack.Navigator screenOptions={{headerShown: false}}>
-          {/* <Stack.Screen name="BottomStack" component={BottomStack} /> */}
-          <Stack.Screen name="HomeScreen" component={HomeScreen} />
-          <Stack.Screen name="SignUp" component={SignUp} />
-          <Stack.Screen name="LogIn" component={LogIn} />
-          <Stack.Screen name="ForgetPassword" component={ForgetPassword} />
-          <Stack.Screen name="OTP" component={OtpScreen} />
-          <Stack.Screen name="GeneratePassword" component={GeneratePassword} />
-          <Stack.Screen
-            name="RegisterSuccessfull"
-            component={RegisterSuccessfull}
-          />
-          <Stack.Screen name="ProfileForm" component={ProfileForm} />
-          <Stack.Screen
-            name="MerchantProfileForm"
-            component={MerchantProfileForm}
-          />
-          <Stack.Screen name="BottomStack" component={BottomStack} />
-        </Stack.Navigator>
-      </NavigationContainer>
-      <ToastComponent />
-    </Provider>
-  );
-}
-
-export default App;
-
-
-
 import React, {useEffect, useState} from 'react';
-import {
-  Image,
-  StyleSheet,
-  Text,
-  TouchableOpacity,
-  View,
-  Alert,
-  Keyboard,
-  PermissionsAndroid,
-  TextInput,
-} from 'react-native';
-import {useDispatch, useSelector} from 'react-redux';
-import {AppDispatch, RootState} from '../../store';
+import {Image, StyleSheet, Text, TouchableOpacity, View} from 'react-native';
+
 import {SafeAreaView} from 'react-native-safe-area-context';
 import {fonts} from '../../constant';
 import {KeyboardAwareScrollView} from 'react-native-keyboard-aware-scroll-view';
 import InputBox from '../../../components/InputBox';
 import DateTimePickerModal from 'react-native-modal-datetime-picker';
-import GenderDropdown from '../../../components/GenderDropdown';
 import * as Yup from 'yup';
-import SearchableDropdown from '../../../components/SearchableDropdown';
 import data, {State, District} from '../../../data';
 import Toast from 'react-native-toast-message';
 import * as Progress from 'react-native-progress';
-import DocumentPicker from 'react-native-document-picker';
-import AsyncStorage from '@react-native-async-storage/async-storage';
 import {useAndroidBackButton} from '../../../hooks/useAndroidButton';
 import {CommonActions} from '@react-navigation/native';
 import images from '../../../assets';
-import Pdf from 'react-native-pdf';
-import ImageCropPicker from 'react-native-image-crop-picker';
-import ImagePicker from 'react-native-image-picker';
+import colors from '../../../constants';
 
 const ProfileFormSchema = Yup.object().shape({
   name: Yup.string().required('Name is required'),
@@ -147,17 +29,21 @@ interface Errors {
   [key: string]: string | undefined;
 }
 
+function getEmployeeById(id: number) {
+  return data.Employees.find(employee => employee.id === id);
+}
+
 function AddEmployee({navigation, route}: any) {
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [date, setDate] = useState('');
   const [isDatePickerVisible, setDatePickerVisibility] = useState(false);
-  const [gender, setGender] = useState(null);
+  const [gender, setGender] = useState<number | null>(null);
   const [genderName, setGendername] = useState('');
-  const [mobileNumber, setMobileNumber] = useState(null);
-  const [altMobile, setAltMobile] = useState(null);
-  const [addressLine, setAddressLine] = useState('');
-  const [errors, setErrors] = useState<Errors>({}); // Initialize errors with the correct type
+  const [mobileNumber, setMobileNumber] = useState<string | null>(null);
+  const [altMobile, setAltMobile] = useState<string | null>(null);
+  const [addressLine, setAddressLine] = useState<string | null>(null);
+  const [errors, setErrors] = useState<Errors>({});
   const [state, setState] = useState<number | null>(null);
   const [stateName, setStateName] = useState<string | null>(null);
   const [districts, setDistricts] = useState<District[]>([]);
@@ -165,18 +51,29 @@ function AddEmployee({navigation, route}: any) {
   const [districtName, setDistrictName] = useState<string | null>(null);
   const [completedPer, setCompletedPer] = useState(0);
   const [photo, setPhoto] = useState<string | null>(null);
-  const [file, setFile] = useState(null);
+  const [id, setId] = useState<string | null>(null);
+  const [idType, setIdType] = useState<string | null>(null);
+  const [pdfName, setPdfName] = useState<string | null>(null);
+  const [method, setMethod] = useState<string>('ADD');
+  const [status, setStatus] = useState<number | null>(null);
+  const [statusName, setStatusName] = useState<string | null>(null);
+
   useAndroidBackButton(() => {
-    navigation.dispatch(
-      CommonActions.reset({
-        index: 1,
-        routes: [{name: 'BottomStack'}],
-      }),
-    );
+    const {method} = route.params;
+    if (method === 'ADD') {
+      navigation.dispatch(
+        CommonActions.reset({
+          index: 1,
+          routes: [{name: 'BottomStack'}],
+        }),
+      );
+    } else {
+      navigation.navigate('BottomStack', {screen: 'Employess'});
+    }
   });
 
   const calculateProgress = () => {
-    const totalFields = 10;
+    const totalFields = 11;
     let filledFields = 0;
 
     // Count filled fields
@@ -190,6 +87,7 @@ function AddEmployee({navigation, route}: any) {
     if (addressLine) filledFields++;
     if (state !== null) filledFields++;
     if (district !== null) filledFields++;
+    if (id !== null) filledFields++;
 
     // Calculate progress percentage
     const completedPercentage = (filledFields / totalFields) * 100;
@@ -213,7 +111,43 @@ function AddEmployee({navigation, route}: any) {
     addressLine,
     state,
     district,
+    id,
   ]);
+
+  useEffect(() => {
+    const {method, id} = route.params;
+
+    if (method === 'EDIT') {
+      const employeeData = getEmployeeById(id);
+      setMethod('EDIT');
+      if (employeeData) {
+        findDist(employeeData?.stateId);
+        setPhoto(employeeData?.profileImg);
+        setName(employeeData?.name);
+        setEmail(employeeData?.email);
+        setMobileNumber(employeeData?.mobileNumber);
+        setAltMobile(employeeData?.altMobileNo);
+        setDate(employeeData?.dob);
+        setGender(employeeData?.genderId);
+        setGendername(employeeData?.gender);
+        setAddressLine(employeeData?.cityVillage);
+        setState(employeeData?.stateId);
+        setStateName(employeeData?.state);
+        setDistrict(employeeData?.distId);
+        setDistrictName(employeeData?.dist);
+        setId(employeeData?.idImage);
+        setIdType(employeeData?.idType);
+        setStatus(employeeData?.statusId);
+        setStatusName(employeeData?.status);
+      }
+    }
+  }, [route.params]);
+
+  const findDist = (state: any) => {
+    const selectedDistricts =
+      data.districts[state as keyof typeof data.districts] || [];
+    setDistricts(selectedDistricts);
+  };
 
   const showDatePicker = () => {
     setDatePickerVisibility(true);
@@ -250,9 +184,6 @@ function AddEmployee({navigation, route}: any) {
   const handleDropdownChange = (option: any) => {
     setGender(option.id);
   };
-  //   const handleShopCategory = (option: any) => {
-  //     setShopCategory(option.id);
-  //   };
 
   const handleLocation = () => {
     Toast.show({
@@ -261,69 +192,6 @@ function AddEmployee({navigation, route}: any) {
       text2: 'Please enter location manually.',
     });
   };
-
-  const requestCameraPermission = async () => {
-    navigation.navigate('UploadPhoto');
-  };
-
-  const handleFilePicker = async () => {
-    try {
-      const res = await DocumentPicker.pick({
-        type: [DocumentPicker.types.images, DocumentPicker.types.pdf],
-      });
-      setFile(res);
-    } catch (err) {
-      if (DocumentPicker.isCancel(err)) {
-        Alert.alert('Cancelled');
-      } else {
-        Alert.alert('Unknown Error: ', JSON.stringify(err));
-        throw err;
-      }
-    }
-  };
-
-  const handleImagePicker = () => {
-    ImagePicker.showImagePicker({}, response => {
-      if (response.didCancel) {
-        Alert.alert('Cancelled');
-      } else if (response.error) {
-        Alert.alert('ImagePicker Error: ', response.error);
-      } else if (response.customButton) {
-        Alert.alert('User tapped custom button: ', response.customButton);
-      } else {
-        const source = { uri: response.uri };
-        setFile(source);
-      }
-    });
-  };
-
-  const handleUpload = () => {
-    Alert.alert(
-      'Choose File',
-      '',
-      [
-        { text: 'Image', onPress: () => handleImagePicker() },
-        { text: 'Document', onPress: () => handleFilePicker() },
-      ],
-      { cancelable: true }
-    );
-  };
-
-  const renderPreview = () => {
-    if (!file) {
-      return null;
-    }
-
-    if (file.type === 'application/pdf') {
-      return <Pdf source={{ uri: file.uri }} style={styles.pdf} />;
-    } else if (file.type.startsWith('image/')) {
-      return <Image source={{ uri: file.uri }} style={styles.image} />;
-    } else {
-      return null;
-    }
-  };
-
-  
 
   const handleSubmit = async () => {
     try {
@@ -353,14 +221,22 @@ function AddEmployee({navigation, route}: any) {
       });
       Toast.show({
         type: 'success',
-        text1: 'Employee Added successfully',
+        text1: `${
+          method === 'ADD'
+            ? 'Employee Added successfully'
+            : 'Employee Updated Successfully'
+        }`,
       });
-      navigation.dispatch(
-        CommonActions.reset({
-          index: 1,
-          routes: [{name: 'BottomStack'}],
-        }),
-      );
+      if (method === 'ADD') {
+        navigation.dispatch(
+          CommonActions.reset({
+            index: 1,
+            routes: [{name: 'BottomStack'}],
+          }),
+        );
+      } else {
+        navigation.navigate('BottomStack', {screen: 'Employess'});
+      }
     } catch (err: any) {
       const validationErrors: Errors = {};
       if (err.inner && err.inner.length > 0) {
@@ -393,7 +269,9 @@ function AddEmployee({navigation, route}: any) {
       </TouchableOpacity>
 
       <View style={styles.headerContainer}>
-        <Text style={styles.headerText}>Employee Details</Text>
+        <Text style={styles.headerText}>
+          {method === 'ADD' ? 'Add Employee' : 'Edit Employee'}
+        </Text>
       </View>
       <View style={{width: '90%', alignSelf: 'center'}}>
         <Progress.Bar
@@ -638,12 +516,68 @@ function AddEmployee({navigation, route}: any) {
           <Text style={styles.getLocationText}>Use my current location</Text>
         </TouchableOpacity>
 
+        {method === 'EDIT' && (
+          <View style={styles.stateContainer}>
+            <Text style={styles.stateHeader}>
+              Status<Text style={{color: 'red', fontWeight: 'bold'}}>*</Text>
+            </Text>
+            <TouchableOpacity
+              onPress={() =>
+                navigation.navigate('StatusModal', {
+                  status: status,
+                  statusData: (status: any) => {
+                    setStatus(status.id);
+                    setStatusName(status.label);
+                  },
+                })
+              }
+              style={[
+                styles.stateTouch,
+                {borderColor: errors.state ? 'red' : '#ccc'},
+              ]}>
+              <Text style={{color: stateName ? '#000' : 'gray'}}>
+                {statusName ? statusName : 'Choose Status'}
+              </Text>
+              <Image
+                source={images.Dropdown_Arrow}
+                style={styles.dropdownArrow}
+              />
+            </TouchableOpacity>
+            {errors.status && (
+              <Text style={{color: 'red'}}>Status is required</Text>
+            )}
+          </View>
+        )}
+
         <View style={styles.uploadContainer}>
           <Text style={styles.stateHeader}>Upload ID</Text>
-          <TouchableOpacity style={styles.uploadButton} onPress={handleUpload}>
-            <Image source={images.Upload_Icon} style={styles.uploadIcon} />
+          <TouchableOpacity
+            style={styles.uploadButton}
+            onPress={() =>
+              navigation.navigate('UploadChoiceModal', {
+                idData: (id: any) => {
+                  console.log('id is: ', id);
+                  setId(id.idUrl);
+                  setIdType(id.idType);
+                  setPdfName(id.pdfName);
+                },
+              })
+            }>
+            {id ? (
+              idType === 'image' ? (
+                <View style={styles.idImageContainer}>
+                  <Image source={{uri: id}} style={styles.idImage} />
+                </View>
+              ) : (
+                <View style={styles.idPdf}>
+                  <Image source={images.Pdf_Icon} style={styles.pdfIcon} />
+                  <Text style={styles.pdfName}>{pdfName}</Text>
+                </View>
+              )
+            ) : (
+              <Image source={images.Upload_Icon} style={styles.uploadIcon} />
+            )}
           </TouchableOpacity>
-          {file && renderPreview()}
         </View>
 
         <TouchableOpacity style={styles.button} onPress={handleSubmit}>
@@ -783,18 +717,33 @@ const styles = StyleSheet.create({
     height: 100,
     width: 100,
   },
-  image: {
-    width: 200,
-    height: 200,
-    marginTop: 20,
-  },
-  pdf: {
-    flex: 1,
+  idPdf: {
+    alignItems: 'center',
+    justifyContent: 'center',
     width: '100%',
     height: '100%',
-    marginTop: 20,
+    padding: 5,
+  },
+  pdfIcon: {
+    height: 30,
+    width: 30,
+    tintColor: colors.primaryColor,
+    marginBottom: 10,
+  },
+  pdfName: {
+    fontSize: 14,
+    color: 'black',
+    fontFamily: fonts.POPPINS_REGULAR,
+  },
+  idImage: {
+    height: '100%',
+    width: '100%',
+    objectFit: 'contain',
+  },
+  idImageContainer: {
+    height: '100%',
+    width: '100%',
   },
 });
 
 export default AddEmployee;
-

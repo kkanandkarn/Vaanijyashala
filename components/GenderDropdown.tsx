@@ -1,12 +1,11 @@
-import React, { useEffect, useState } from 'react';
-import { StyleSheet, Text, View } from 'react-native';
-import { Dropdown } from 'react-native-element-dropdown';
-import { fonts } from '../src/constant';
+import React, {useEffect, useState} from 'react';
+import {StyleSheet, Text, View} from 'react-native';
+import {Dropdown} from 'react-native-element-dropdown';
+import {fonts} from '../src/constant';
 
 interface DropdownOption {
   id: number;
   label: string;
-
 }
 
 interface DropdownProps {
@@ -16,32 +15,42 @@ interface DropdownProps {
 }
 
 interface GenderDropdownProps extends DropdownProps {
-    error?: boolean;
-    errorMessage?: string;
-    
-  }
-  
+  error?: boolean;
+  errorMessage?: string;
+}
 
-const GenderDropdown: React.FC<GenderDropdownProps> = ({ data, title, onSelectValue,  error,
-    errorMessage }) => {
-  const [selectedOption, setSelectedOption] = useState<DropdownOption | null>(null);
+const GenderDropdown: React.FC<GenderDropdownProps> = ({
+  data,
+  title,
+  onSelectValue,
+  error,
+  errorMessage,
+}) => {
+  const [selectedOption, setSelectedOption] = useState<DropdownOption | null>(
+    null,
+  );
   const [isFocus, setIsFocus] = useState(false);
-
-
 
   const handleDropdownChange = (option: DropdownOption) => {
     setSelectedOption(option);
-    onSelectValue(option); 
+    onSelectValue(option);
     setIsFocus(false);
   };
 
-
-
   return (
     <View style={styles.container}>
-      {title && <Text style={styles.title}>{title}<Text style={{color: 'red', fontSize: 20}}>*</Text></Text>}
+      {title && (
+        <Text style={styles.title}>
+          {title}
+          <Text style={{color: 'red', fontSize: 20}}>*</Text>
+        </Text>
+      )}
       <Dropdown
-        style={[styles.dropdown, isFocus && { borderColor: 'blue' }, error && { borderColor: 'red' }]}      
+        style={[
+          styles.dropdown,
+          isFocus && {borderColor: 'blue'},
+          error && {borderColor: 'red'},
+        ]}
         searchPlaceholder="Search..."
         data={data}
         maxHeight={300}
@@ -50,10 +59,12 @@ const GenderDropdown: React.FC<GenderDropdownProps> = ({ data, title, onSelectVa
         value={selectedOption}
         onFocus={() => setIsFocus(true)}
         onBlur={() => setIsFocus(false)}
-        onChange={(item) => handleDropdownChange(item)} 
-        placeholder='Choose Gender'
+        onChange={item => handleDropdownChange(item)}
+        placeholder="Choose Gender"
       />
-       {error && errorMessage && <Text style={{ color: 'red' }}>{errorMessage}</Text>}
+      {error && errorMessage && (
+        <Text style={{color: 'red'}}>{errorMessage}</Text>
+      )}
     </View>
   );
 };
@@ -70,12 +81,13 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderRadius: 8,
     paddingHorizontal: 8,
+    color: 'black',
   },
   title: {
     fontSize: 16,
     color: '#333',
     marginBottom: 5,
-    fontFamily: fonts.POPPINS_BOLD
+    fontFamily: fonts.POPPINS_BOLD,
   },
 });
 

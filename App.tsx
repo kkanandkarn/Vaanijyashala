@@ -30,6 +30,18 @@ import BottomStack from './src/screens/BottomStack/BottomStack';
 import SplashScreen from './src/screens/SplashScreen';
 import DashboardModal from './components/DashboardModal';
 import ProductHistory from './src/screens/Products/ProductHistory';
+import Notifications from './src/screens/Notifications';
+import EmployeeProfile from './src/screens/MerchantScreens/EmployeeProfile';
+import AddEmployee from './src/screens/MerchantScreens/AddEmployee';
+import UploadPhoto from './components/UploadPhoto';
+import StateModal from './components/StateModal';
+import ImageCapturePermission from './components/ImageCapturePermission';
+import GenderModal from './components/GenderModal';
+import DistrictModal from './components/DistrictModal';
+import ShopCategoryModal from './components/ShopCategoryModal';
+import UploadChoiceModal from './components/UploadChoiceModal';
+import StatusModal from './components/StatusModal';
+import EmployeeActivity from './src/screens/MerchantScreens/EmployeeActivity';
 
 const Stack = createNativeStackNavigator();
 
@@ -77,11 +89,82 @@ function App(): React.JSX.Element {
             <Stack.Screen name="OnBoarding" component={OnBoarding} />
             <Stack.Screen name="BottomStack" component={BottomStack} />
             <Stack.Screen name="ProductHistory" component={ProductHistory} />
+            <Stack.Screen name="Notifications" component={Notifications} />
+            <Stack.Screen name="EmployeeProfile" component={EmployeeProfile} />
+            <Stack.Screen name="AddEmployee" component={AddEmployee} />
+            <Stack.Screen
+              name="EmployeeActivity"
+              component={EmployeeActivity}
+            />
           </Stack.Group>
           <Stack.Group screenOptions={{presentation: 'transparentModal'}}>
             <Stack.Screen
               name="DashboardModal"
               component={DashboardModal}
+              options={{
+                animation: 'slide_from_bottom',
+                headerShown: false,
+              }}
+            />
+            <Stack.Screen
+              name="UploadPhoto"
+              component={UploadPhoto}
+              options={{
+                animation: 'slide_from_bottom',
+                headerShown: false,
+              }}
+            />
+            <Stack.Screen
+              name="StateModal"
+              component={StateModal}
+              options={{
+                animation: 'slide_from_bottom',
+                headerShown: false,
+              }}
+            />
+            <Stack.Screen
+              name="ImageCapturePermission"
+              component={ImageCapturePermission}
+              options={{
+                animation: 'slide_from_bottom',
+                headerShown: false,
+              }}
+            />
+            <Stack.Screen
+              name="GenderModal"
+              component={GenderModal}
+              options={{
+                animation: 'slide_from_bottom',
+                headerShown: false,
+              }}
+            />
+            <Stack.Screen
+              name="DistrictModal"
+              component={DistrictModal}
+              options={{
+                animation: 'slide_from_bottom',
+                headerShown: false,
+              }}
+            />
+            <Stack.Screen
+              name="ShopCategoryModal"
+              component={ShopCategoryModal}
+              options={{
+                animation: 'slide_from_bottom',
+                headerShown: false,
+              }}
+            />
+            <Stack.Screen
+              name="UploadChoiceModal"
+              component={UploadChoiceModal}
+              options={{
+                animation: 'slide_from_bottom',
+                headerShown: false,
+              }}
+            />
+            <Stack.Screen
+              name="StatusModal"
+              component={StatusModal}
               options={{
                 animation: 'slide_from_bottom',
                 headerShown: false,

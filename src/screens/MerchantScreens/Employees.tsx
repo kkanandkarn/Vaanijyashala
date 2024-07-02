@@ -7,7 +7,7 @@ import {TouchableOpacity} from 'react-native-gesture-handler';
 import images from '../../../assets';
 import {fonts} from '../../constant';
 
-function Employees() {
+function Employees({navigation}: any) {
   const [search, setSearch] = useState('');
   const [filteredProducts, setFilteredProducts] = useState(data.Employees);
 
@@ -28,7 +28,11 @@ function Employees() {
   };
   const renderItem = ({item}: any) => (
     <TouchableOpacity
-      onPress={() => console.log(item.id)}
+      onPress={() =>
+        navigation.navigate('EmployeeProfile', {
+          id: item.id,
+        })
+      }
       style={[
         styles.itemContainer,
         {
@@ -54,7 +58,6 @@ function Employees() {
       </View>
       <View style={styles.groupText}>
         <Text style={styles.itemText}>
-          {' '}
           {item.email.length > 25
             ? `${item.email.substring(0, 25)}...`
             : item.email}
@@ -85,7 +88,7 @@ function Employees() {
   return (
     <SafeAreaView
       style={{backgroundColor: 'white', height: '100%', paddingHorizontal: 20}}>
-      <Header header={'Employees'} />
+      <Header header={'Employees'} navigation={navigation} />
       <View style={styles.searchBox}>
         <TextInput
           keyboardType="default"

@@ -44,10 +44,12 @@ function Profile({navigation}: any) {
             <Text style={styles.LinksText}>Become a Partner</Text>
             <Image source={images.Right_Half_Arrow} style={styles.rightArrow} />
           </View>
-          <View style={styles.Links}>
+          <TouchableOpacity
+            style={styles.Links}
+            onPress={() => navigation.navigate('Notifications')}>
             <Text style={styles.LinksText}>Notifications</Text>
             <Image source={images.Right_Half_Arrow} style={styles.rightArrow} />
-          </View>
+          </TouchableOpacity>
         </View>
 
         <View style={styles.LinkContainer}>

@@ -56,7 +56,7 @@ function Ledger({navigation}: any) {
   return (
     <SafeAreaView
       style={{backgroundColor: 'white', height: '100%', paddingHorizontal: 20}}>
-      <Header header={'Ledger'} />
+      <Header header={'Ledger'} navigation={navigation} />
       {data.Ledger.length ? (
         <FlatList
           data={data.Ledger}

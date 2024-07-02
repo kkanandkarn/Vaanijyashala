@@ -14,11 +14,15 @@ function Header({navigation}: any) {
       </TouchableOpacity>
 
       <Text style={styles.headerText}>Products</Text>
-
-      <Image source={images.Notification} style={styles.notificationIcon} />
-      <View style={styles.notificationContainer}>
-        <Text style={styles.notificationCount}>10</Text>
-      </View>
+      <TouchableOpacity
+        onPress={() => {
+          navigation.navigate('Notifications');
+        }}>
+        <Image source={images.Notification} style={styles.notificationIcon} />
+        <View style={styles.notificationContainer}>
+          <Text style={styles.notificationCount}>10</Text>
+        </View>
+      </TouchableOpacity>
     </SafeAreaView>
   );
 }
@@ -40,7 +44,7 @@ const styles = StyleSheet.create({
   },
   notificationContainer: {
     position: 'absolute',
-    top: 3,
+    top: -5,
     right: -10,
     height: 25,
     width: 25,

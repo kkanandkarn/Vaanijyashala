@@ -41,7 +41,9 @@ function LogIn({navigation}: any) {
     checkAuth();
   }, []);
 
-  useAndroidBackButton(() => {});
+  useAndroidBackButton(() => {
+    BackHandler.exitApp();
+  });
   const submitForm = async () => {
     try {
       await LoginSchema.validate({email, password}, {abortEarly: false});

@@ -1,6 +1,8 @@
 import React, { useState } from 'react';
-import { Text, TextInput, View, StyleSheet } from 'react-native';
+import { Text, TextInput, View, StyleSheet, Image } from 'react-native';
 import { fonts } from '../src/constant';
+
+import images from '../assets';
 
 function InputBox({
   inputTitle,
@@ -15,8 +17,7 @@ function InputBox({
   errorMessage = '',
   required = false,
   editable= true,
-  isDate = false
-  
+  isDate = false,
 }) {
   const [touched, setTouched] = useState(false);
   
@@ -28,8 +29,8 @@ function InputBox({
   // };
 
   return (
-    <View style={styles.container}>
-      <Text style={styles.inputTitle}>{inputTitle}{required && <Text style={{color: 'red', fontSize: 20}}>*</Text>}</Text>
+    <View style={[styles.container]}>
+       <Text style={styles.inputTitle}>{inputTitle}{required && <Text style={{color: 'red', fontSize: 20}}>*</Text>}</Text>
       <TextInput
         style={[
           styles.inputBox,
@@ -49,6 +50,7 @@ function InputBox({
         editable={editable}
         
       />
+
       {error && touched && <Text style={styles.errorMessage}>{errorMessage}</Text>}
       {error && !touched && <Text style={styles.errorMessage}>{errorMessage}</Text>}
     </View>
@@ -90,6 +92,13 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     color: '#333',
     borderColor: '#ccc',
+  },
+  arrow: {
+    height: 20,
+    width: 20,
+    position: 'absolute',
+    top: 10,
+    right: 10
   }
 });
 

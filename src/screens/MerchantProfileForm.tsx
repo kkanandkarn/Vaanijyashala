@@ -22,10 +22,11 @@ import SearchableDropdown from '../../components/SearchableDropdown';
 import data, {State, District} from '../../data';
 import Toast from 'react-native-toast-message';
 import * as Progress from 'react-native-progress';
-import {launchCamera} from 'react-native-image-picker';
+import ImagePicker from 'react-native-image-crop-picker';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import {useAndroidBackButton} from '../../hooks/useAndroidButton';
 import {CommonActions} from '@react-navigation/native';
+import images from '../../assets';
 
 const ProfileFormSchema = Yup.object().shape({
   name: Yup.string().required('Name is required'),
@@ -50,14 +51,18 @@ function MerchantProfileForm({navigation}: any) {
   const [date, setDate] = useState('');
   const [isDatePickerVisible, setDatePickerVisibility] = useState(false);
   const [gender, setGender] = useState(null);
+  const [genderName, setGenderName] = useState('');
   const [mobileNumber, setMobileNumber] = useState(null);
   const [altMobile, setAltMobile] = useState(null);
   const [addressLine, setAddressLine] = useState('');
   const [errors, setErrors] = useState<Errors>({}); // Initialize errors with the correct type
   const [state, setState] = useState<number | null>(null);
+  const [stateName, setStateName] = useState<string | null>(null);
   const [districts, setDistricts] = useState<District[]>([]);
   const [district, setDistrict] = useState<number | null>(null);
+  const [districtName, setDistrictName] = useState<string | null>('');
   const [shopCategory, setShopCategory] = useState<number | null>(null);
+  const [shopCategoryName, setShopCategoryName] = useState<string | null>('');
   const [pinCode, setPinCode] = useState(null);
   const [gst, setGst] = useState(null);
   const [completedPer, setCompletedPer] = useState(0);
@@ -72,10 +77,11 @@ function MerchantProfileForm({navigation}: any) {
   });
 
   const calculateProgress = () => {
-    const totalFields = 12; // Total number of input fields
+    const totalFields = 13; // Total number of input fields
     let filledFields = 0;
 
     // Count filled fields
+    if (photo) filledFields++;
     if (name) filledFields++;
     if (email) filledFields++;
     if (date) filledFields++;
@@ -97,6 +103,7 @@ function MerchantProfileForm({navigation}: any) {
   useEffect(() => {
     calculateProgress();
   }, [
+    photo,
     name,
     email,
     date,
@@ -173,53 +180,6 @@ function MerchantProfileForm({navigation}: any) {
       text1: 'Geolocation is not available at this time.',
       text2: 'Please enter location manually.',
     });
-  };
-
-  const requestCameraPermission = async () => {
-    try {
-      const granted = await PermissionsAndroid.request(
-        PermissionsAndroid.PERMISSIONS.CAMERA,
-        {
-          title: 'Camera Permission',
-          message: 'App needs camera permission',
-          buttonNeutral: 'Ask Me Later',
-          buttonNegative: 'Cancel',
-          buttonPositive: 'OK',
-        },
-      );
-      if (granted === PermissionsAndroid.RESULTS.GRANTED) {
-        launchCamera(
-          {
-            mediaType: 'photo',
-            saveToPhotos: true,
-          },
-          response => {
-            if (response.didCancel) {
-              console.log('User cancelled image picker');
-            } else if (response.errorCode) {
-              console.log('ImagePicker Error: ', response.errorMessage);
-            } else if (response.assets && response.assets.length > 0) {
-              const sourceUri = response.assets[0].uri;
-              if (sourceUri) {
-                console.log(response.assets);
-                setPhoto(sourceUri);
-              } else {
-                console.log('Photo URI is undefined');
-              }
-            }
-          },
-        );
-      } else {
-        console.log('Camera permission denied');
-        Toast.show({
-          type: 'error',
-          text1: 'Camera permission denied',
-          text2: 'Allow camera permission to capture image',
-        });
-      }
-    } catch (err) {
-      console.warn(err);
-    }
   };
 
   const handleSubmit = async () => {
@@ -309,14 +269,20 @@ function MerchantProfileForm({navigation}: any) {
         <Text style={styles.completedPerText}>{completedPer}% completed</Text>
       </View>
       <KeyboardAwareScrollView
-        style={{width: '100%', alignSelf: 'center', marginTop: 10}}
+        style={{width: '100%', alignSelf: 'flex-start', marginTop: 10}}
         contentContainerStyle={{
           justifyContent: 'center',
           alignItems: 'center',
         }}>
         <TouchableOpacity
           style={styles.cameraButton}
-          onPress={requestCameraPermission}>
+          onPress={() =>
+            navigation.navigate('UploadPhoto', {
+              photoData: (photoUrl: any) => {
+                setPhoto(photoUrl);
+              },
+            })
+          }>
           {photo ? (
             <Image source={{uri: photo}} style={styles.capturedImage} />
           ) : (
@@ -357,21 +323,30 @@ function MerchantProfileForm({navigation}: any) {
           required={true}
           editable={false}
         />
-        <TouchableOpacity onPress={showDatePicker} style={{width: '100%'}}>
-          <InputBox
-            inputTitle="Date of Birth"
-            autoComplete="off"
-            keyboardType="default"
-            placeholder="Choose date of birth"
-            value={date}
-            onChangeText={setDate}
-            error={!!errors.date}
-            errorMessage={errors.date ? errors.date : ''}
-            required={true}
-            editable={false}
-            isDate={true}
-          />
-        </TouchableOpacity>
+
+        <View style={styles.stateContainer}>
+          <Text style={styles.stateHeader}>
+            Date of Birth
+            <Text style={{color: 'red', fontWeight: 'bold'}}>*</Text>
+          </Text>
+          <TouchableOpacity
+            onPress={showDatePicker}
+            style={[
+              styles.stateTouch,
+              {borderColor: errors.date ? 'red' : '#ccc'},
+            ]}>
+            <Text style={{color: date ? '#000' : 'gray'}}>
+              {date ? date : 'Choose Date of Birth'}
+            </Text>
+            <Image
+              source={images.Dropdown_Arrow}
+              style={styles.dropdownArrow}
+            />
+          </TouchableOpacity>
+          {errors.date && (
+            <Text style={{color: 'red'}}>Date of Birth is required</Text>
+          )}
+        </View>
 
         <DateTimePickerModal
           isVisible={isDatePickerVisible}
@@ -381,13 +356,36 @@ function MerchantProfileForm({navigation}: any) {
           onConfirm={handleConfirm}
           onCancel={hideDatePicker}
         />
-        <GenderDropdown
-          data={dropdownValues}
-          title={'Choose Gender'}
-          onSelectValue={handleDropdownChange}
-          error={!!errors.gender}
-          errorMessage={errors.gender ? errors.gender : ''}
-        />
+        <View style={styles.stateContainer}>
+          <Text style={styles.stateHeader}>
+            Gender<Text style={{color: 'red', fontWeight: 'bold'}}>*</Text>
+          </Text>
+          <TouchableOpacity
+            onPress={() =>
+              navigation.navigate('GenderModal', {
+                gender: gender,
+                genderData: (gender: any) => {
+                  setGender(gender.id);
+                  setGenderName(gender.label);
+                },
+              })
+            }
+            style={[
+              styles.stateTouch,
+              {borderColor: errors.gender ? 'red' : '#ccc'},
+            ]}>
+            <Text style={{color: gender ? '#000' : 'gray'}}>
+              {genderName ? genderName : 'Choose Gender'}
+            </Text>
+            <Image
+              source={images.Dropdown_Arrow}
+              style={styles.dropdownArrow}
+            />
+          </TouchableOpacity>
+          {errors.gender && (
+            <Text style={{color: 'red'}}>Gender is required</Text>
+          )}
+        </View>
 
         <InputBox
           inputTitle="Mobile No."
@@ -422,31 +420,108 @@ function MerchantProfileForm({navigation}: any) {
           required={true}
         />
 
-        <SearchableDropdown
-          data={data.shopCategories}
-          title={'Shop Type'}
-          onSelectValue={handleShopCategory}
-          error={!!errors.shopCategory}
-          errorMessage={errors.shopCategory ? errors.shopCategory : ''}
-          placeholder="Choose Shop Type"
-        />
+        <View style={styles.stateContainer}>
+          <Text style={styles.stateHeader}>
+            Shop Type<Text style={{color: 'red', fontWeight: 'bold'}}>*</Text>
+          </Text>
+          <TouchableOpacity
+            onPress={() =>
+              navigation.navigate('ShopCategoryModal', {
+                shopCategory: shopCategory,
+                shopCategoryData: (shopCategory: any) => {
+                  setShopCategory(shopCategory.id);
+                  setShopCategoryName(shopCategory.label);
+                },
+              })
+            }
+            style={[
+              styles.stateTouch,
+              {borderColor: errors.state ? 'red' : '#ccc'},
+            ]}>
+            <Text style={{color: shopCategory ? '#000' : 'gray'}}>
+              {shopCategoryName ? shopCategoryName : 'Choose Shop Type'}
+            </Text>
+            <Image
+              source={images.Dropdown_Arrow}
+              style={styles.dropdownArrow}
+            />
+          </TouchableOpacity>
+          {errors.shopCategory && (
+            <Text style={{color: 'red'}}>Shop Type is required</Text>
+          )}
+        </View>
 
-        <SearchableDropdown
-          data={data.states}
-          title={'State'}
-          onSelectValue={handleStateChange}
-          error={!!errors.state}
-          errorMessage={errors.state ? errors.state : ''}
-          placeholder="Choose State"
-        />
-        <SearchableDropdown
-          data={districts}
-          title={'District'}
-          onSelectValue={(option: District) => handleDistrictChange(option)}
-          error={!!errors.district}
-          errorMessage={errors.district ? errors.district : ''}
-          placeholder="Choose district"
-        />
+        <View style={styles.stateContainer}>
+          <Text style={styles.stateHeader}>
+            State<Text style={{color: 'red', fontWeight: 'bold'}}>*</Text>
+          </Text>
+          <TouchableOpacity
+            onPress={() =>
+              navigation.navigate('StateModal', {
+                state: state,
+                stateData: (state: any) => {
+                  setState(state.id);
+                  setStateName(state.label);
+                  setDistrict(null);
+                  setDistrictName(null);
+                  const selectedDistricts =
+                    data.districts[state.id as keyof typeof data.districts] ||
+                    [];
+                  setDistricts(selectedDistricts);
+                },
+              })
+            }
+            style={[
+              styles.stateTouch,
+              {borderColor: errors.state ? 'red' : '#ccc'},
+            ]}>
+            <Text style={{color: stateName ? '#000' : 'gray'}}>
+              {stateName ? stateName : 'Choose State'}
+            </Text>
+            <Image
+              source={images.Dropdown_Arrow}
+              style={styles.dropdownArrow}
+            />
+          </TouchableOpacity>
+          {errors.state && (
+            <Text style={{color: 'red'}}>State is required</Text>
+          )}
+        </View>
+
+        <View style={styles.stateContainer}>
+          <Text style={styles.stateHeader}>
+            District<Text style={{color: 'red', fontWeight: 'bold'}}>*</Text>
+          </Text>
+          <TouchableOpacity
+            onPress={() =>
+              navigation.navigate('DistrictModal', {
+                district: district,
+                districts: districts,
+                districtData: (district: any) => {
+                  setDistrict(district.id);
+                  setDistrictName(district.label);
+                  const selectedDistricts =
+                    data.districts[state as keyof typeof data.districts] || [];
+                  setDistricts(selectedDistricts);
+                },
+              })
+            }
+            style={[
+              styles.stateTouch,
+              {borderColor: errors.state ? 'red' : '#ccc'},
+            ]}>
+            <Text style={{color: districtName ? '#000' : 'gray'}}>
+              {districtName ? districtName : 'Choose district'}
+            </Text>
+            <Image
+              source={images.Dropdown_Arrow}
+              style={styles.dropdownArrow}
+            />
+          </TouchableOpacity>
+          {errors.district && (
+            <Text style={{color: 'red'}}>District is required</Text>
+          )}
+        </View>
 
         <InputBox
           inputTitle="PIN Code"
@@ -571,6 +646,32 @@ const styles = StyleSheet.create({
     left: 70,
     width: 35,
     height: 35,
+  },
+  stateHeader: {
+    textAlign: 'left',
+    marginBottom: 5,
+    fontSize: 16,
+    color: '#333',
+    fontFamily: fonts.POPPINS_BOLD,
+  },
+  stateContainer: {
+    width: '100%',
+    paddingHorizontal: 20,
+    paddingVertical: 10,
+  },
+  stateTouch: {
+    height: 50,
+    borderWidth: 2,
+    borderRadius: 8,
+    paddingHorizontal: 10,
+    justifyContent: 'center',
+  },
+  dropdownArrow: {
+    height: 20,
+    width: 20,
+    position: 'absolute',
+    top: 15,
+    right: 10,
   },
 });
 

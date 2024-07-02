@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, {useEffect, useState} from 'react';
 import {
   Alert,
   Image,
@@ -15,20 +15,34 @@ import {KeyboardAwareScrollView} from 'react-native-keyboard-aware-scroll-view';
 import images from '../../../assets';
 import {fonts} from '../../constant';
 import Header from './Header';
+import {useDispatch} from 'react-redux';
+import {resetFormData} from '../../store/formSlice';
 
 function SellerDashboard({navigation}: any) {
   const [username, setUsername] = useState('Anand Kumar Karn');
   const [modalVisible, setModalVisible] = useState(false);
+  const dispatch = useDispatch();
+  useEffect(() => {
+    dispatch(resetFormData());
+  }, []);
 
   return (
     <SafeAreaView style={{flex: 1, backgroundColor: 'white'}}>
       <KeyboardAwareScrollView style={{width: '100%'}}>
         <View style={styles.container}>
           <Image source={images.User1} style={styles.userImage} />
-          <Image source={images.Notification} style={styles.notificationIcon} />
-          <View style={styles.notificationContainer}>
-            <Text style={styles.notificationCount}>10</Text>
-          </View>
+          <TouchableOpacity
+            onPress={() => {
+              navigation.navigate('Notifications');
+            }}>
+            <Image
+              source={images.Notification}
+              style={styles.notificationIcon}
+            />
+            <View style={styles.notificationContainer}>
+              <Text style={styles.notificationCount}>10</Text>
+            </View>
+          </TouchableOpacity>
         </View>
         <View style={styles.usercontainer}>
           <Text style={styles.username}>
@@ -111,8 +125,8 @@ const styles = StyleSheet.create({
   },
   notificationContainer: {
     position: 'absolute',
-    top: 15,
-    right: 8,
+    top: 0,
+    left: 15,
     height: 25,
     width: 25,
     backgroundColor: '#E65629',

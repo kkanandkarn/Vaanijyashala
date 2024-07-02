@@ -4,17 +4,30 @@ import images from '../../../assets';
 import {SafeAreaView} from 'react-native-safe-area-context';
 import colors from '../../../constants';
 import {fonts} from '../../constant';
+import {TouchableOpacity} from 'react-native-gesture-handler';
 
-function Header({header}: any) {
+function Header({header, navigation}: any) {
   return (
     <SafeAreaView style={styles.container}>
       <View style={styles.header}>
         <Text style={styles.headerText}>{header}</Text>
       </View>
-      <Image source={images.Notification} style={styles.notificationIcon} />
-      <View style={styles.notificationContainer}>
-        <Text style={styles.notificationCount}>10</Text>
-      </View>
+      <TouchableOpacity
+        style={{
+          height: 40,
+          width: 40,
+          position: 'absolute',
+          top: -32,
+          right: 8,
+        }}
+        onPress={() => {
+          navigation.navigate('Notifications');
+        }}>
+        <Image source={images.Notification} style={styles.notificationIcon} />
+        <View style={styles.notificationContainer}>
+          <Text style={styles.notificationCount}>10</Text>
+        </View>
+      </TouchableOpacity>
     </SafeAreaView>
   );
 }
@@ -24,7 +37,6 @@ const styles = StyleSheet.create({
     width: '100%',
     height: 50,
     justifyContent: 'center',
-    alignItems: 'center',
     backgroundColor: 'white',
   },
   header: {
@@ -36,14 +48,11 @@ const styles = StyleSheet.create({
   notificationIcon: {
     height: 30,
     width: 30,
-    position: 'absolute',
-    top: 10,
-    right: 20,
   },
   notificationContainer: {
     position: 'absolute',
-    top: 4,
-    right: 8,
+    top: -6,
+    left: 15,
     height: 25,
     width: 25,
     backgroundColor: '#E65629',
