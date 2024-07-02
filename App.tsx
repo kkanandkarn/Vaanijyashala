@@ -42,6 +42,7 @@ import ShopCategoryModal from './components/ShopCategoryModal';
 import UploadChoiceModal from './components/UploadChoiceModal';
 import StatusModal from './components/StatusModal';
 import EmployeeActivity from './src/screens/MerchantScreens/EmployeeActivity';
+import MerchantProfile from './src/screens/MerchantScreens/MerchantProfile';
 
 const Stack = createNativeStackNavigator();
 
@@ -92,6 +93,7 @@ function App(): React.JSX.Element {
             <Stack.Screen name="Notifications" component={Notifications} />
             <Stack.Screen name="EmployeeProfile" component={EmployeeProfile} />
             <Stack.Screen name="AddEmployee" component={AddEmployee} />
+            <Stack.Screen name="MerchantProfile" component={MerchantProfile} />
             <Stack.Screen
               name="EmployeeActivity"
               component={EmployeeActivity}

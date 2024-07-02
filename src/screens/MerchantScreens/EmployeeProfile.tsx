@@ -120,6 +120,7 @@ function EmployeeProfile({navigation, route}: any) {
       style={{
         backgroundColor: 'white',
         padding: 15,
+        height: '100%',
       }}>
       <View style={styles.Header}>
         <TouchableOpacity onPress={() => navigation.goBack()}>

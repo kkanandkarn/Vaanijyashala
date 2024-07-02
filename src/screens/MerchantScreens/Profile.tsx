@@ -28,14 +28,15 @@ function Profile({navigation}: any) {
 
       <View style={styles.container}>
         <View style={styles.LinkContainer}>
-          <View
+          <TouchableOpacity
+            onPress={() => navigation.navigate('MerchantProfile')}
             style={[
               styles.Links,
               {borderBottomColor: '#EB7854', borderBottomWidth: 1},
             ]}>
             <Text style={styles.LinksText}>Profile Details</Text>
             <Image source={images.Right_Half_Arrow} style={styles.rightArrow} />
-          </View>
+          </TouchableOpacity>
           <View
             style={[
               styles.Links,
