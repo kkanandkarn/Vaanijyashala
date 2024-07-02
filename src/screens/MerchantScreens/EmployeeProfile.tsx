@@ -62,7 +62,6 @@ function EmployeeProfile({navigation, route}: any) {
   const downloadFile = async () => {
     const url =
       'https://bwms-bpsc.codebucketstage.online/api/advertisement/2024-06-03T05-42-29.701Z-BRCCO_2023_11680430%20(1).pdf';
-
     const fileName = url.split('/').pop();
     console.log(fileName);
     const destPath = `${RNFS.DownloadDirectoryPath}/${fileName}`;
@@ -70,6 +69,7 @@ function EmployeeProfile({navigation, route}: any) {
 
     try {
       setDownloadStart(true);
+      console.log('download started');
       const download = RNFS.downloadFile({
         fromUrl: url,
         toFile: destPath,
@@ -100,6 +100,7 @@ function EmployeeProfile({navigation, route}: any) {
         Toast.show({
           type: 'error',
           text1: 'Download failed',
+          text2: 'Please check the connection or try again lator',
         });
       }
     } catch (error) {
@@ -108,6 +109,7 @@ function EmployeeProfile({navigation, route}: any) {
       Toast.show({
         type: 'error',
         text1: 'Download failed',
+        text2: 'Please check the connection or try again lator',
       });
       console.log(error);
     }

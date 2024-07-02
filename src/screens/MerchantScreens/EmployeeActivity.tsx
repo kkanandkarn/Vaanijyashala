@@ -15,18 +15,22 @@ function getEmployeeById(id: number) {
 function EmployeeActivity({navigation, route}: any) {
   const [photo, setPhoto] = useState<string | null>(null);
   const [name, setName] = useState<string | null>(null);
+  const [employeeId, setEmployeeId] = useState<string | null>(null);
   useEffect(() => {
     const {id} = route.params;
     const employee = getEmployeeById(id);
     if (employee) {
       setPhoto(employee?.profileImg);
       setName(employee?.name);
+      setEmployeeId(employee?.EmployeeId);
     }
   }, [route.params]);
-  const renderItem = ({item}: any) => {
+  const renderItem = ({item, index}: any) => {
     return (
       <SafeAreaView style={styles.container}>
-        <View style={styles.container1}></View>
+        <View style={styles.container1}>
+          <Text style={styles.srNo}>{index + 1}</Text>
+        </View>
         <View style={styles.container2}>
           <Text style={styles.activity}>{item.activity}</Text>
           <Text style={styles.dateTime}>{item.dateTime}</Text>
@@ -46,21 +50,20 @@ function EmployeeActivity({navigation, route}: any) {
         </View>
       </View>
 
-      <KeyboardAwareScrollView showsVerticalScrollIndicator={false}>
-        {photo && <Image source={images.User1} style={styles.userImage} />}
+      {photo && <Image source={images.User1} style={styles.userImage} />}
 
-        <Text style={styles.username}>{name}</Text>
-        {data.Activities.length ? (
-          <FlatList
-            data={data.Activities}
-            renderItem={renderItem}
-            keyExtractor={item => item.id.toString()}
-            showsVerticalScrollIndicator={false}
-          />
-        ) : (
-          <Text>No data found</Text>
-        )}
-      </KeyboardAwareScrollView>
+      <Text style={styles.employeeId}>{employeeId}</Text>
+      <Text style={styles.username}>{name}</Text>
+      {data.Activities.length ? (
+        <FlatList
+          data={data.Activities}
+          renderItem={renderItem}
+          keyExtractor={item => item.id.toString()}
+          showsVerticalScrollIndicator={false}
+        />
+      ) : (
+        <Text>No data found</Text>
+      )}
     </SafeAreaView>
   );
 }
@@ -88,12 +91,22 @@ const styles = StyleSheet.create({
     borderRadius: 50,
     marginTop: 20,
   },
+  employeeId: {
+    textAlign: 'center',
+    fontSize: 18,
+    fontFamily: fonts.POPPINS_BOLD,
+    color: colors.primaryColor,
+    marginTop: 10,
+  },
   username: {
     textAlign: 'center',
     fontSize: 18,
     fontFamily: fonts.POPPINS_BOLD,
     color: 'gray',
-    marginTop: 10,
+    borderBottomColor: 'gray',
+    borderBottomWidth: 5,
+    paddingBottom: 15,
+    marginBottom: 10,
   },
   container: {
     flexDirection: 'row',
@@ -101,31 +114,38 @@ const styles = StyleSheet.create({
     width: '90%',
   },
   container1: {
-    width: 80,
-    height: 80,
+    width: 75,
+    height: 75,
     borderRadius: 50,
     backgroundColor: colors.primaryColor,
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   container2: {
     backgroundColor: colors.primaryColor,
     width: '90%',
     position: 'absolute',
-    top: 20,
-    left: 65,
+    top: 18,
+    left: 60,
     paddingVertical: 5,
-    paddingHorizontal: 10,
+    paddingHorizontal: 25,
     borderTopRightRadius: 12,
     borderBottomRightRadius: 12,
   },
   activity: {
     color: 'white',
     fontFamily: fonts.POPPINS_BOLD,
-    fontSize: 16,
+    fontSize: 14,
   },
   dateTime: {
     color: 'white',
     fontFamily: fonts.POPPINS_REGULAR,
-    fontSize: 14,
+    fontSize: 12,
+  },
+  srNo: {
+    color: 'white',
+    fontSize: 20,
+    fontFamily: fonts.POPPINS_BOLD,
   },
 });
 
