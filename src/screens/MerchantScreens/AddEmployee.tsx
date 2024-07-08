@@ -1,5 +1,12 @@
-import React, {useEffect, useState} from 'react';
-import {Image, StyleSheet, Text, TouchableOpacity, View} from 'react-native';
+import React, {useEffect, useRef, useState} from 'react';
+import {
+  Image,
+  StyleSheet,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  View,
+} from 'react-native';
 
 import {SafeAreaView} from 'react-native-safe-area-context';
 import {fonts} from '../../constant';
@@ -14,8 +21,30 @@ import {useAndroidBackButton} from '../../../hooks/useAndroidButton';
 import {CommonActions} from '@react-navigation/native';
 import images from '../../../assets';
 import colors from '../../../constants';
+import CheckBox from '@react-native-community/checkbox';
 
-const ProfileFormSchema = Yup.object().shape({
+const passwordValidation = Yup.string()
+  .required('Password is required')
+  .min(8, 'Password should be at least 8 characters long')
+  .matches(/[0-9]/, 'Password must include at least one number')
+  .matches(/[A-Z]/, 'Password must include at least one uppercase letter')
+  .matches(/[a-z]/, 'Password must include at least one lowercase letter')
+  .matches(
+    /[!@#$%^&*(),.?":{}|<>]/,
+    'Password must include at least one special character',
+  );
+
+const AddProfileFormSchema = Yup.object().shape({
+  name: Yup.string().required('Name is required'),
+  email: Yup.string().email('Invalid email').required('Email is required'),
+  password: passwordValidation,
+  date: Yup.string().required('Date of birth is required'),
+  gender: Yup.number().required('Gender is required'),
+  addressLine: Yup.string().required('Address Line is required'),
+  state: Yup.number().required('State is required'),
+  district: Yup.number().required('District is required'),
+});
+const EditProfileFormSchema = Yup.object().shape({
   name: Yup.string().required('Name is required'),
   email: Yup.string().email('Invalid email').required('Email is required'),
   date: Yup.string().required('Date of birth is required'),
@@ -57,6 +86,9 @@ function AddEmployee({navigation, route}: any) {
   const [method, setMethod] = useState<string>('ADD');
   const [status, setStatus] = useState<number | null>(null);
   const [statusName, setStatusName] = useState<string | null>(null);
+  const [password, setPassword] = useState<string | null>(null);
+  const [sellPerm, setSellPerm] = useState<boolean>(true);
+  const [addPerm, setAddPerm] = useState<boolean>(true);
 
   useAndroidBackButton(() => {
     const {method} = route.params;
@@ -72,14 +104,24 @@ function AddEmployee({navigation, route}: any) {
     }
   });
 
+  const nameRef = useRef<TextInput>(null);
+  const emailRef = useRef<TextInput>(null);
+  const passwordRef = useRef<TextInput>(null);
+
+  const genderRef = useRef<TextInput>(null);
+  const addressLineRef = useRef<TextInput>(null);
+  const stateRef = useRef<TextInput>(null);
+  const districtRef = useRef<TextInput>(null);
+
   const calculateProgress = () => {
-    const totalFields = 11;
+    const totalFields = 12;
     let filledFields = 0;
 
     // Count filled fields
     if (photo) filledFields++;
     if (name) filledFields++;
     if (email) filledFields++;
+    if (password) filledFields++;
     if (date) filledFields++;
     if (mobileNumber) filledFields++;
     if (altMobile) filledFields++;
@@ -94,16 +136,13 @@ function AddEmployee({navigation, route}: any) {
     setCompletedPer(Math.round(completedPercentage));
   };
 
-  const handleDistrictChange = (option: any) => {
-    setDistrict(option.id);
-  };
-
   useEffect(() => {
     calculateProgress();
   }, [
     photo,
     name,
     email,
+    password,
     date,
     mobileNumber,
     altMobile,
@@ -163,6 +202,7 @@ function AddEmployee({navigation, route}: any) {
       today.getMonth(),
       today.getDate(),
     );
+
     return minDate;
   };
   const getDefaultDate = () => {
@@ -172,6 +212,7 @@ function AddEmployee({navigation, route}: any) {
       today.getMonth(),
       today.getDate(),
     );
+
     return defaultDateValue;
   };
 
@@ -179,10 +220,6 @@ function AddEmployee({navigation, route}: any) {
     const formattedDate = date.toLocaleDateString('en-GB');
     setDate(formattedDate);
     hideDatePicker();
-  };
-
-  const handleDropdownChange = (option: any) => {
-    setGender(option.id);
   };
 
   const handleLocation = () => {
@@ -193,32 +230,60 @@ function AddEmployee({navigation, route}: any) {
     });
   };
 
+  const handleSellCheckboxChange = (value: boolean) => {
+    setSellPerm(value);
+  };
+  const handleAddCheckboxChange = (value: boolean) => {
+    setAddPerm(value);
+  };
+
   const handleSubmit = async () => {
     try {
-      await ProfileFormSchema.validate(
-        {
-          name,
-          email,
-          date,
-          gender,
-          addressLine,
-          state,
-          district,
-        },
-        {abortEarly: false},
-      );
+      if (method === 'ADD') {
+        await AddProfileFormSchema.validate(
+          {
+            name,
+            email,
+            password,
+            date,
+            gender,
+            addressLine,
+            state,
+            district,
+          },
+          {abortEarly: false},
+        );
+      } else {
+        await EditProfileFormSchema.validate(
+          {
+            name,
+            email,
+            password,
+            date,
+            gender,
+            addressLine,
+            state,
+            district,
+          },
+          {abortEarly: false},
+        );
+      }
 
-      console.log('Form data1:', {
+      console.log(
         name,
         email,
+        password,
         date,
         gender,
-        mobileNumber,
-        altMobile,
         addressLine,
         state,
         district,
-      });
+        mobileNumber,
+        altMobile,
+        addPerm,
+        sellPerm,
+      );
+
       Toast.show({
         type: 'success',
         text1: `${
@@ -246,8 +311,23 @@ function AddEmployee({navigation, route}: any) {
           }
         });
       }
-      console.log(validationErrors);
+
       setErrors(validationErrors);
+      if (validationErrors.name) {
+        nameRef.current?.focus();
+      } else if (validationErrors.email) {
+        emailRef.current?.focus();
+      } else if (validationErrors.password) {
+        passwordRef.current?.focus();
+      } else if (validationErrors.gender) {
+        genderRef.current?.focus();
+      } else if (validationErrors.addressLine) {
+        addressLineRef.current?.focus();
+      } else if (validationErrors.state) {
+        stateRef.current?.focus();
+      } else if (validationErrors.district) {
+        districtRef.current?.focus();
+      }
     }
   };
 
@@ -328,6 +408,8 @@ function AddEmployee({navigation, route}: any) {
           error={!!errors.name}
           errorMessage={errors.name ? errors.name : ''}
           required={true}
+          isReference={true}
+          reference={nameRef}
         />
         <InputBox
           inputTitle="Email"
@@ -339,6 +421,23 @@ function AddEmployee({navigation, route}: any) {
           error={!!errors.email}
           errorMessage={errors.email ? errors.email : ''}
           required={true}
+          isReference={true}
+          reference={emailRef}
+        />
+        <InputBox
+          inputTitle="Password"
+          autoComplete="off"
+          keyboardType="default"
+          placeholder="Enter Password"
+          value={password}
+          onChangeText={setPassword}
+          error={!!errors.password}
+          errorMessage={errors.password ? errors.password : ''}
+          secureTextEntry={true}
+          required={true}
+          isPassword={true}
+          isReference={true}
+          reference={passwordRef}
         />
         <View style={styles.stateContainer}>
           <Text style={styles.stateHeader}>
@@ -434,6 +533,8 @@ function AddEmployee({navigation, route}: any) {
           error={!!errors.addressLine}
           errorMessage={errors.addressLine ? errors.addressLine : ''}
           required={true}
+          isReference={true}
+          reference={addressLineRef}
         />
 
         <View style={styles.stateContainer}>
@@ -548,6 +649,26 @@ function AddEmployee({navigation, route}: any) {
             )}
           </View>
         )}
+
+        <View style={styles.PermissionContainer}>
+          <Text style={styles.permissionHeader}>Permissions</Text>
+          <View style={styles.checkBoxContainer}>
+            <CheckBox
+              value={sellPerm}
+              onValueChange={handleSellCheckboxChange}
+              tintColors={{true: '#E65629', false: '#000000'}}
+            />
+            <Text style={styles.checkBoxText}>Sell Product</Text>
+          </View>
+          <View style={styles.checkBoxContainer}>
+            <CheckBox
+              value={addPerm}
+              onValueChange={handleAddCheckboxChange}
+              tintColors={{true: '#E65629', false: '#000000'}}
+            />
+            <Text style={styles.checkBoxText}>Add Product</Text>
+          </View>
+        </View>
 
         <View style={styles.uploadContainer}>
           <Text style={styles.stateHeader}>Upload ID</Text>
@@ -743,6 +864,31 @@ const styles = StyleSheet.create({
   idImageContainer: {
     height: '100%',
     width: '100%',
+  },
+  PermissionContainer: {
+    width: '100%',
+    paddingHorizontal: 20,
+    paddingVertical: 10,
+  },
+  permissionHeader: {
+    marginTop: 10,
+    textAlign: 'left',
+    marginBottom: 5,
+    fontSize: 16,
+    color: '#333',
+    fontFamily: fonts.POPPINS_BOLD,
+  },
+  checkBoxContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginTop: 10,
+    width: '90%',
+  },
+  checkBoxText: {
+    fontSize: 14,
+    fontFamily: fonts.POPPINS_REGULAR,
+    color: '#000',
+    marginLeft: 5,
   },
 });
 

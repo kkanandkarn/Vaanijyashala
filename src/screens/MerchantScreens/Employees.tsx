@@ -6,10 +6,12 @@ import data from '../../../data';
 import {TouchableOpacity} from 'react-native-gesture-handler';
 import images from '../../../assets';
 import {fonts} from '../../constant';
+import colors from '../../../constants';
 
 function Employees({navigation}: any) {
   const [search, setSearch] = useState('');
   const [filteredProducts, setFilteredProducts] = useState(data.Employees);
+  const [confirm, setConfirm] = useState<string | null>(null);
 
   const handleSearch = (text: any) => {
     setSearch(text);
@@ -26,6 +28,7 @@ function Employees({navigation}: any) {
       setFilteredProducts(data.Employees);
     }
   };
+
   const renderItem = ({item}: any) => (
     <TouchableOpacity
       onPress={() =>
@@ -82,6 +85,24 @@ function Employees({navigation}: any) {
           ]}>
           {item.status}
         </Text>
+
+        <TouchableOpacity
+          style={styles.iconButtons}
+          onPress={() =>
+            navigation.navigate('EmployeeDeleteConfirmModal', {
+              id: item.id,
+              confirmData: (confirm: any) => {
+                setConfirm(confirm);
+                if (confirm === 'Yes') {
+                  console.log('Yes');
+                } else {
+                  console.log('No');
+                }
+              },
+            })
+          }>
+          <Text style={styles.crossIcon}>X</Text>
+        </TouchableOpacity>
       </View>
     </TouchableOpacity>
   );
@@ -161,6 +182,19 @@ const styles = StyleSheet.create({
     color: 'black',
     textAlign: 'center',
     marginTop: 20,
+  },
+  iconButtons: {
+    height: 25,
+    width: 25,
+    backgroundColor: colors.primaryColor,
+    justifyContent: 'center',
+    alignItems: 'center',
+    borderRadius: 50,
+  },
+  crossIcon: {
+    fontSize: 14,
+    color: 'white',
+    fontWeight: 'bold',
   },
 });
 export default Employees;

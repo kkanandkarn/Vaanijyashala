@@ -1,13 +1,5 @@
-import {
-  Image,
-  SafeAreaView,
-  StatusBar,
-  StyleSheet,
-  Text,
-  TouchableOpacity,
-  View,
-} from 'react-native';
-import React, {useLayoutEffect} from 'react';
+import {SafeAreaView, StatusBar, StyleSheet, View} from 'react-native';
+import React from 'react';
 
 import SegmentedControl from '@react-native-segmented-control/segmented-control';
 import {createNativeStackNavigator} from '@react-navigation/native-stack';

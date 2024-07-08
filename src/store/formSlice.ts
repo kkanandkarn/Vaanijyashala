@@ -11,7 +11,7 @@ interface FormData {
 }
 
 const initialState: FormData = {
-    selectedRole: 2,
+    selectedRole: 1,
     inputForm: '',
     email: '',
     name: '',

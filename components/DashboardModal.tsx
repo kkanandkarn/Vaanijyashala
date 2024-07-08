@@ -42,7 +42,14 @@ function DashboardModal({navigation}: any) {
             <Image source={images.Group_Users} style={styles.IconImage1} />
             <Text style={styles.IconText}>Employee</Text>
           </TouchableOpacity>
-          <TouchableOpacity style={styles.bottons}>
+          <TouchableOpacity
+            style={styles.bottons}
+            onPress={() =>
+              navigation.navigate('AddProduct', {
+                method: 'ADD',
+                id: null,
+              })
+            }>
             <Image source={images.Products_Icon} style={styles.IconImage2} />
             <Text style={styles.IconText}>Product</Text>
           </TouchableOpacity>
@@ -56,7 +63,7 @@ const styles = StyleSheet.create({
   container: {
     backgroundColor: 'white',
     height: 200,
-    width: 380,
+    width: '90%',
     borderRadius: 16,
     padding: 20,
   },

@@ -6,7 +6,6 @@ import {fonts} from '../../constant';
 import colors from '../../../constants';
 import images from '../../../assets';
 import data from '../../../data';
-import {KeyboardAwareScrollView} from 'react-native-keyboard-aware-scroll-view';
 
 function getEmployeeById(id: number) {
   return data.Employees.find(employee => employee.id === id);
@@ -102,7 +101,7 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     fontSize: 18,
     fontFamily: fonts.POPPINS_BOLD,
-    color: 'gray',
+    color: '#585553',
     borderBottomColor: 'gray',
     borderBottomWidth: 5,
     paddingBottom: 15,
@@ -111,39 +110,33 @@ const styles = StyleSheet.create({
   container: {
     flexDirection: 'row',
     paddingVertical: 10,
-    width: '90%',
+    width: '100%',
+    borderBottomColor: 'gray',
+    borderBottomWidth: 2,
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   container1: {
-    width: 75,
+    width: '20%',
     height: 75,
-    borderRadius: 50,
-    backgroundColor: colors.primaryColor,
     alignItems: 'center',
     justifyContent: 'center',
   },
   container2: {
-    backgroundColor: colors.primaryColor,
-    width: '90%',
-    position: 'absolute',
-    top: 18,
-    left: 60,
-    paddingVertical: 5,
-    paddingHorizontal: 25,
-    borderTopRightRadius: 12,
-    borderBottomRightRadius: 12,
+    width: '80%',
   },
   activity: {
-    color: 'white',
+    color: '#000',
     fontFamily: fonts.POPPINS_BOLD,
     fontSize: 14,
   },
   dateTime: {
-    color: 'white',
+    color: '#000',
     fontFamily: fonts.POPPINS_REGULAR,
     fontSize: 12,
   },
   srNo: {
-    color: 'white',
+    color: '#000',
     fontSize: 20,
     fontFamily: fonts.POPPINS_BOLD,
   },

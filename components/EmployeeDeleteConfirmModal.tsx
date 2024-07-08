@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {useEffect, useState} from 'react';
 import {
   Button,
   Image,
@@ -11,8 +11,28 @@ import {
 import {SafeAreaView} from 'react-native-safe-area-context';
 import images from '../assets';
 import {fonts} from '../src/constant';
+import Toast from 'react-native-toast-message';
 
-function ImageCapturePermission({navigation}: any) {
+function EmployeeDeleteConfirmModal({navigation, route}: any) {
+  const [employeeId, setEmployeeId] = useState<number | null>(null);
+  const [confirm, setConfirm] = useState<string | null>(null);
+  useEffect(() => {
+    const {id} = route.params;
+    setEmployeeId(id);
+  }, [route.params]);
+  const handleCancel = () => {
+    navigation.goBack();
+    route.params.confirmData('No');
+  };
+  const handleDelete = () => {
+    console.log('Deleted Employee=> ', employeeId);
+    Toast.show({
+      type: 'success',
+      text1: 'Employee Deleted Successfully',
+    });
+    navigation.goBack();
+    route.params.confirmData('Yes');
+  };
   return (
     <SafeAreaView
       style={{
@@ -22,25 +42,24 @@ function ImageCapturePermission({navigation}: any) {
         backgroundColor: 'rgba(0, 0, 0, 0.5)',
       }}>
       <View style={styles.container}>
-        <Text style={styles.headerText}>Enable Permission</Text>
+        <Text style={styles.headerText}>Delete Confirmation</Text>
         <Text style={styles.contentText}>
-          Enable permission to capture image
+          Are you sure want to delete this employee ?
         </Text>
+
         <View style={styles.buttonContainer}>
           <TouchableOpacity
-            onPress={() => navigation.goBack()}
+            onPress={handleCancel}
             style={[
               styles.button,
               {borderRightColor: 'gray', borderRightWidth: 2},
             ]}>
-            <Text style={[styles.buttonText, {color: 'red'}]}>Cancel</Text>
+            <Text style={[styles.buttonText, {color: 'black'}]}>Cancel</Text>
           </TouchableOpacity>
           <TouchableOpacity
             style={styles.button}
-            onPress={() => Linking.openSettings()}>
-            <Text style={[styles.buttonText, {color: 'green'}]}>
-              Go to Setting
-            </Text>
+            onPress={() => handleDelete()}>
+            <Text style={[styles.buttonText, {color: 'red'}]}>Confirm</Text>
           </TouchableOpacity>
         </View>
       </View>
@@ -56,7 +75,7 @@ const styles = StyleSheet.create({
     borderRadius: 16,
   },
   headerText: {
-    fontFamily: fonts.POPPINS_REGULAR,
+    fontFamily: fonts.POPPINS_BOLD,
     textAlign: 'center',
     fontSize: 18,
     color: '#000',
@@ -66,7 +85,7 @@ const styles = StyleSheet.create({
   contentText: {
     fontFamily: fonts.POPPINS_REGULAR,
     textAlign: 'center',
-    fontSize: 14,
+    fontSize: 16,
     color: '#000',
     marginVertical: 20,
   },
@@ -86,8 +105,8 @@ const styles = StyleSheet.create({
   },
   buttonText: {
     fontFamily: fonts.POPPINS_REGULAR,
-    fontSize: 16,
+    fontSize: 18,
   },
 });
 
-export default ImageCapturePermission;
+export default EmployeeDeleteConfirmModal;

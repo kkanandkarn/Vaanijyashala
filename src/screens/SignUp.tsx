@@ -8,10 +8,10 @@ import {
   Platform,
   SafeAreaView,
   BackHandler,
+  Image,
 } from 'react-native';
 import {fonts} from '../constant';
 import InputBox from '../../components/InputBox';
-import Dropdown from '../../components/Dropdown';
 import CheckBox from '@react-native-community/checkbox';
 import {RegisterFormContext} from '../contexts/RegisterFormContext';
 import {KeyboardAwareScrollView} from 'react-native-keyboard-aware-scroll-view';
@@ -22,6 +22,8 @@ import Toast from 'react-native-toast-message';
 import * as yup from 'yup';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import {useAndroidBackButton} from '../../hooks/useAndroidButton';
+import images from '../../assets';
+import * as Yup from 'yup';
 
 interface DropdownOption {
   id: number;
@@ -34,17 +36,14 @@ interface FormErrors {
 const SignUpSchema = yup.object().shape({
   name: yup.string().required('Name is required'),
   email: yup.string().email('Invalid email').required('Email is required'),
+  selectedRole: yup.number().required('Choose your role'),
 });
 
 const SignUp: React.FC = ({navigation}: any) => {
-  const dropdownValues = [
-    // {id: 1, label: 'User'},
-    {id: 2, label: 'Seller/Merchant'},
-  ];
-
   const formData = useSelector((state: RootState) => state.form);
   const dispatch = useDispatch<AppDispatch>();
-
+  const [role, setRole] = useState<number>(1);
+  const [roleName, setRoleName] = useState<string>('Merchant/Seller');
   const [referralError, setReferralError] = useState(false);
   const [isAgreeError, setIsAgreeError] = useState(false);
   const [formErrors, setFormErrors] = useState<FormErrors>({});
@@ -57,6 +56,8 @@ const SignUp: React.FC = ({navigation}: any) => {
       if (!formData.isChecked) {
         setIsAgreeError(true);
       }
+
+      dispatch(setFormData({selectedRole: role}));
 
       await SignUpSchema.validate(formData, {abortEarly: false});
       if (formData.isChecked) {
@@ -85,11 +86,8 @@ const SignUp: React.FC = ({navigation}: any) => {
   const handleCheckboxChange = (value: boolean) => {
     dispatch(setFormData({isChecked: value}));
     if (value) {
-      setIsAgreeError(false); // Reset error when checked
+      setIsAgreeError(false);
     }
-  };
-  const handleDropdownChange = (option: DropdownOption) => {
-    dispatch(setFormData({selectedRole: option.id}));
   };
 
   return (
@@ -105,11 +103,37 @@ const SignUp: React.FC = ({navigation}: any) => {
           alignItems: 'center',
         }}>
         <Text style={styles.welcomeText}>Welcome</Text>
-        <Dropdown
-          data={dropdownValues}
-          title={'Register as'}
-          onSelectValue={handleDropdownChange}
-        />
+        <View style={styles.stateContainer}>
+          <Text style={styles.stateHeader}>
+            Register As<Text style={{color: 'red', fontWeight: 'bold'}}>*</Text>
+          </Text>
+          <TouchableOpacity
+            onPress={() =>
+              navigation.navigate('UserRoleModal', {
+                role: role,
+                roleData: (role: any) => {
+                  setRole(role.id);
+                  setRoleName(role.label);
+                  dispatch(setFormData({selectedRole: role}));
+                },
+              })
+            }
+            style={[
+              styles.stateTouch,
+              {borderColor: formErrors.role ? 'red' : '#ccc'},
+            ]}>
+            <Text style={{color: role ? '#000' : 'gray'}}>
+              {roleName ? roleName : 'Register As'}
+            </Text>
+            <Image
+              source={images.Dropdown_Arrow}
+              style={styles.dropdownArrow}
+            />
+          </TouchableOpacity>
+          {formErrors.role && (
+            <Text style={{color: 'red'}}>Choose your role</Text>
+          )}
+        </View>
 
         <InputBox
           inputTitle="Name"
@@ -253,6 +277,32 @@ const styles = StyleSheet.create({
     fontFamily: fonts.POPPINS_REGULAR,
     fontSize: 16,
     marginBottom: 10,
+  },
+  stateHeader: {
+    textAlign: 'left',
+    marginBottom: 5,
+    fontSize: 16,
+    color: '#333',
+    fontFamily: fonts.POPPINS_BOLD,
+  },
+  stateContainer: {
+    width: '100%',
+    paddingHorizontal: 15,
+    paddingVertical: 10,
+  },
+  stateTouch: {
+    height: 50,
+    borderWidth: 2,
+    borderRadius: 8,
+    paddingHorizontal: 10,
+    justifyContent: 'center',
+  },
+  dropdownArrow: {
+    height: 20,
+    width: 20,
+    position: 'absolute',
+    top: 15,
+    right: 10,
   },
 });
 

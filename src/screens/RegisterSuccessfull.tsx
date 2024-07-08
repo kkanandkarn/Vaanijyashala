@@ -15,13 +15,12 @@ import {CommonActions} from '@react-navigation/native';
 
 function RegisterSuccessfull({navigation}: any) {
   const formData = useSelector((state: RootState) => state.form);
+  console.log('formData: ', formData);
 
   const handleSubmit = () => {
-    if (formData.selectedRole === 1) {
-      navigation.navigate('ProfileForm');
-    } else {
-      navigation.navigate('MerchantProfileForm');
-    }
+    navigation.navigate('MerchantProfileForm', {
+      method: 'ADD',
+    });
   };
   useAndroidBackButton(() => {
     navigation.dispatch(

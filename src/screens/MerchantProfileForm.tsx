@@ -1,4 +1,4 @@
-import React, {useEffect, useState} from 'react';
+import React, {useEffect, useRef, useState} from 'react';
 import {
   Image,
   StyleSheet,
@@ -16,14 +16,10 @@ import {fonts} from '../constant';
 import {KeyboardAwareScrollView} from 'react-native-keyboard-aware-scroll-view';
 import InputBox from '../../components/InputBox';
 import DateTimePickerModal from 'react-native-modal-datetime-picker';
-import GenderDropdown from '../../components/GenderDropdown';
 import * as Yup from 'yup';
-import SearchableDropdown from '../../components/SearchableDropdown';
 import data, {State, District} from '../../data';
 import Toast from 'react-native-toast-message';
 import * as Progress from 'react-native-progress';
-import ImagePicker from 'react-native-image-crop-picker';
-import AsyncStorage from '@react-native-async-storage/async-storage';
 import {useAndroidBackButton} from '../../hooks/useAndroidButton';
 import {CommonActions} from '@react-navigation/native';
 import images from '../../assets';
@@ -44,13 +40,13 @@ interface Errors {
   [key: string]: string | undefined;
 }
 
-function MerchantProfileForm({navigation}: any) {
+function MerchantProfileForm({navigation, route}: any) {
   const formData = useSelector((state: RootState) => state.form);
   const [name, setName] = useState(formData.name);
   const [email, setEmail] = useState(formData.email);
   const [date, setDate] = useState('');
   const [isDatePickerVisible, setDatePickerVisibility] = useState(false);
-  const [gender, setGender] = useState(null);
+  const [gender, setGender] = useState<number | null>(null);
   const [genderName, setGenderName] = useState('');
   const [mobileNumber, setMobileNumber] = useState(null);
   const [altMobile, setAltMobile] = useState(null);
@@ -63,21 +59,55 @@ function MerchantProfileForm({navigation}: any) {
   const [districtName, setDistrictName] = useState<string | null>('');
   const [shopCategory, setShopCategory] = useState<number | null>(null);
   const [shopCategoryName, setShopCategoryName] = useState<string | null>('');
-  const [pinCode, setPinCode] = useState(null);
+  const [pinCode, setPinCode] = useState<string | null>(null);
   const [gst, setGst] = useState(null);
   const [completedPer, setCompletedPer] = useState(0);
-  const [photo, setPhoto] = useState<string | null>(null);
+  const [photo, setPhoto] = useState<any>(null);
+  const [method, setMethod] = useState<string>('ADD');
+  const methodRef = useRef(method);
+
+  useEffect(() => {
+    const {method} = route.params;
+    setMethod(method);
+    if (method === 'EDIT') {
+      setName('Anand Kumar Karn');
+      setEmail('anand@gmail.com');
+      setDate('20/04/2002');
+      setGender(1);
+      setGenderName('Male');
+      setAddressLine('Madhubani');
+      setShopCategory(1);
+      setShopCategoryName('Electronics');
+      setState(4);
+      const selectedDistricts =
+        data.districts[state as keyof typeof data.districts] || [];
+      setDistricts(selectedDistricts);
+      setStateName('Bihar');
+      setDistrict(13), setDistrictName('Aurangabad');
+      setPinCode('847211');
+    }
+  }, [route.params]);
+  useEffect(() => {
+    methodRef.current = method;
+  }, [method]);
+
   useAndroidBackButton(() => {
-    navigation.dispatch(
-      CommonActions.reset({
-        index: 1,
-        routes: [{name: 'BottomStack'}],
-      }),
-    );
+    if (methodRef.current === 'ADD') {
+      console.log('method: => ', method);
+      navigation.dispatch(
+        CommonActions.reset({
+          index: 1,
+          routes: [{name: 'BottomStack'}],
+        }),
+      );
+    } else {
+      console.log('EDIT => ', method);
+      navigation.goBack();
+    }
   });
 
   const calculateProgress = () => {
-    const totalFields = 13; // Total number of input fields
+    const totalFields = 13;
     let filledFields = 0;
 
     // Count filled fields
@@ -239,12 +269,16 @@ function MerchantProfileForm({navigation}: any) {
     <SafeAreaView style={{flex: 1, backgroundColor: 'white'}}>
       <TouchableOpacity
         onPress={() => {
-          navigation.dispatch(
-            CommonActions.reset({
-              index: 1,
-              routes: [{name: 'BottomStack'}],
-            }),
-          );
+          if (method === 'ADD') {
+            navigation.dispatch(
+              CommonActions.reset({
+                index: 1,
+                routes: [{name: 'BottomStack'}],
+              }),
+            );
+          } else {
+            navigation.goBack();
+          }
         }}>
         <Image
           source={require('../../assets/img/back_arrow.png')}

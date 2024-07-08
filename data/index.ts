@@ -13,6 +13,10 @@ export interface State {
   }
   
   const data = {
+    roles: [
+{id:1, label: "Merchant/Seller"},
+{id:2, label: "User"}
+    ],
     genders : [
       {id: 1, label: 'Male'},
       {id: 2, label: 'Female'},

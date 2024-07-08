@@ -52,7 +52,14 @@ function MerchantProfile({navigation, route}: any) {
         {/* <Text style={styles.username}>{name}</Text> */}
 
         <View style={styles.buttonContainer}>
-          <TouchableOpacity style={styles.button}>
+          <TouchableOpacity
+            style={styles.button}
+            onPress={() =>
+              navigation.navigate('OnBoarding', {
+                screen: 'MerchantProfileForm',
+                params: {method: 'EDIT'},
+              })
+            }>
             <Text style={styles.buttonText}>Edit</Text>
             <Image source={images.Edit_Icon} style={{height: 20, width: 20}} />
           </TouchableOpacity>

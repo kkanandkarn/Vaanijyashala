@@ -1,7 +1,5 @@
 import React, {useEffect, useState} from 'react';
 import {
-  KeyboardAvoidingView,
-  Platform,
   SafeAreaView,
   StyleSheet,
   Text,
@@ -96,6 +94,7 @@ function LogIn({navigation}: any) {
           errorMessage={errors.password ? errors.password : ''}
           required={true}
           secureTextEntry={true}
+          isPassword={true}
         />
 
         <Text

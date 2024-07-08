@@ -179,16 +179,6 @@ function EmployeeProfile({navigation, route}: any) {
               style={{height: 20, width: 20}}
             />
           </TouchableOpacity>
-
-          {profile.isId && (
-            <TouchableOpacity style={styles.button} onPress={downloadFile}>
-              <Text style={styles.buttonText}>Download Id</Text>
-              <Image
-                source={images.Download_icon}
-                style={{height: 15, width: 15, marginLeft: 2}}
-              />
-            </TouchableOpacity>
-          )}
         </View>
 
         <View style={styles.PesonalDetails}>
@@ -235,6 +225,17 @@ function EmployeeProfile({navigation, route}: any) {
             <Text style={styles.text}>{profile.state}</Text>
           </View>
         </View>
+        {profile.isId && (
+          <TouchableOpacity
+            style={styles.downloadbutton}
+            onPress={downloadFile}>
+            <Text style={styles.buttonText}>Download Id</Text>
+            <Image
+              source={images.Download_icon}
+              style={{height: 15, width: 15, marginLeft: 2}}
+            />
+          </TouchableOpacity>
+        )}
       </KeyboardAwareScrollView>
     </SafeAreaView>
   );
@@ -292,6 +293,17 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     gap: 5,
   },
+  downloadbutton: {
+    flexDirection: 'row',
+    borderColor: 'gray',
+    borderWidth: 1.5,
+    borderRadius: 25,
+    paddingHorizontal: 15,
+    paddingVertical: 5,
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginTop: 10,
+  },
   buttonText: {
     fontFamily: fonts.POPPINS_REGULAR,
     fontSize: 16,
@@ -299,7 +311,7 @@ const styles = StyleSheet.create({
     marginTop: 2,
   },
   PesonalDetails: {
-    paddingVertical: 30,
+    paddingVertical: 20,
     borderBottomColor: 'gray',
     borderBottomWidth: 1,
   },

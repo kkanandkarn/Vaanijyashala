@@ -92,7 +92,7 @@ function GeneratePassword({navigation}: any) {
       <KeyboardAwareScrollView style={{width: '100%', marginTop: 200}}>
         <Text style={styles.welcomeText}>
           {formData.inputForm === 'registerForm'
-            ? 'Generate Password'
+            ? 'Create Password'
             : 'Update Password'}
         </Text>
 
@@ -107,6 +107,7 @@ function GeneratePassword({navigation}: any) {
           errorMessage={errors.password ? errors.password : ''}
           secureTextEntry={true}
           required={true}
+          isPassword={true}
         />
         <InputBox
           inputTitle="Confirm Password"
@@ -119,6 +120,7 @@ function GeneratePassword({navigation}: any) {
           errorMessage={errors.confirmPassword ? errors.confirmPassword : ''}
           secureTextEntry={true}
           required={true}
+          isPassword={true}
         />
 
         <TouchableOpacity style={styles.button} onPress={submitForm}>

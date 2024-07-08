@@ -13,10 +13,12 @@ import {TextInput} from 'react-native-gesture-handler';
 import images from '../../../assets';
 import {fonts} from '../../constant';
 import data from '../../../data';
+import colors from '../../../constants';
 
-function Active() {
+function Active({navigation}: any) {
   const [search, setSearch] = useState('');
   const [filteredProducts, setFilteredProducts] = useState(data.ActiveProducts);
+  const [confirm, setConfirm] = useState<string | null>(null);
   const handleSearch = (text: any) => {
     setSearch(text);
     if (text) {
@@ -32,7 +34,9 @@ function Active() {
   };
   const renderItem = ({item}: any) => (
     <TouchableOpacity
-      onPress={() => console.log(item.id)}
+      onPress={() =>
+        navigation.navigate('ProductDetails', {productId: item.id})
+      }
       style={[
         styles.itemContainer,
         {backgroundColor: item.status === 'Active' ? '#CCC' : '#F2D2BD'},
@@ -61,6 +65,23 @@ function Active() {
           ]}>
           {item.status}
         </Text>
+        <TouchableOpacity
+          style={styles.iconButtons}
+          onPress={() =>
+            navigation.navigate('ProductDeleteConfirmModal', {
+              id: item.id,
+              confirmData: (confirm: any) => {
+                setConfirm(confirm);
+                if (confirm === 'Yes') {
+                  console.log('Yes', item.id);
+                } else {
+                  console.log('No');
+                }
+              },
+            })
+          }>
+          <Text style={styles.crossIcon}>X</Text>
+        </TouchableOpacity>
       </View>
     </TouchableOpacity>
   );
@@ -139,6 +160,19 @@ const styles = StyleSheet.create({
     color: 'black',
     textAlign: 'center',
     marginTop: 20,
+  },
+  crossIcon: {
+    fontSize: 14,
+    color: 'white',
+    fontWeight: 'bold',
+  },
+  iconButtons: {
+    height: 25,
+    width: 25,
+    backgroundColor: colors.primaryColor,
+    justifyContent: 'center',
+    alignItems: 'center',
+    borderRadius: 50,
   },
 });
 

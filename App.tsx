@@ -22,7 +22,6 @@ import {ToastComponent} from './components/ToastComponent';
 import LogIn from './src/screens/LogIn';
 import ForgetPassword from './src/screens/ForgetPassword';
 import RegisterSuccessfull from './src/screens/RegisterSuccessfull';
-import ProfileForm from './src/screens/ProfileForm';
 import MerchantProfileForm from './src/screens/MerchantProfileForm';
 import Dashboard from './src/screens/Dashboard';
 import SellerDashboard from './src/screens/MerchantScreens/SellerDashboard';
@@ -43,6 +42,12 @@ import UploadChoiceModal from './components/UploadChoiceModal';
 import StatusModal from './components/StatusModal';
 import EmployeeActivity from './src/screens/MerchantScreens/EmployeeActivity';
 import MerchantProfile from './src/screens/MerchantScreens/MerchantProfile';
+import UserRoleModal from './components/UserRoleModal';
+import AddProduct from './src/screens/MerchantScreens/AddProduct';
+import UploadMultiPhoto from './components/UploadMultiPhoto';
+import ProductDetails from './src/screens/MerchantScreens/ProductDetails';
+import EmployeeDeleteConfirmModal from './components/EmployeeDeleteConfirmModal';
+import ProductDeleteConfirmModal from './components/ProductDeleteConfirmModal';
 
 const Stack = createNativeStackNavigator();
 
@@ -74,7 +79,7 @@ function App(): React.JSX.Element {
         name="RegisterSuccessfull"
         component={RegisterSuccessfull}
       />
-      <OnBoardingStack.Screen name="ProfileForm" component={ProfileForm} />
+
       <OnBoardingStack.Screen
         name="MerchantProfileForm"
         component={MerchantProfileForm}
@@ -94,6 +99,8 @@ function App(): React.JSX.Element {
             <Stack.Screen name="EmployeeProfile" component={EmployeeProfile} />
             <Stack.Screen name="AddEmployee" component={AddEmployee} />
             <Stack.Screen name="MerchantProfile" component={MerchantProfile} />
+            <Stack.Screen name="AddProduct" component={AddProduct} />
+            <Stack.Screen name="ProductDetails" component={ProductDetails} />
             <Stack.Screen
               name="EmployeeActivity"
               component={EmployeeActivity}
@@ -167,6 +174,38 @@ function App(): React.JSX.Element {
             <Stack.Screen
               name="StatusModal"
               component={StatusModal}
+              options={{
+                animation: 'slide_from_bottom',
+                headerShown: false,
+              }}
+            />
+            <Stack.Screen
+              name="UserRoleModal"
+              component={UserRoleModal}
+              options={{
+                animation: 'slide_from_bottom',
+                headerShown: false,
+              }}
+            />
+            <Stack.Screen
+              name="UploadMultiPhoto"
+              component={UploadMultiPhoto}
+              options={{
+                animation: 'slide_from_bottom',
+                headerShown: false,
+              }}
+            />
+            <Stack.Screen
+              name="EmployeeDeleteConfirmModal"
+              component={EmployeeDeleteConfirmModal}
+              options={{
+                animation: 'slide_from_bottom',
+                headerShown: false,
+              }}
+            />
+            <Stack.Screen
+              name="ProductDeleteConfirmModal"
+              component={ProductDeleteConfirmModal}
               options={{
                 animation: 'slide_from_bottom',
                 headerShown: false,

@@ -83,7 +83,7 @@ function Profile({navigation}: any) {
           </View>
         </View>
       </View>
-      <Text style={styles.version}>Version: v1.1.2</Text>
+      <Text style={styles.version}>Version: v1.1.3</Text>
       <TouchableOpacity onPress={handleLogOut} style={styles.logoutButton}>
         <Text style={styles.logoutText}>Log Out</Text>
       </TouchableOpacity>
